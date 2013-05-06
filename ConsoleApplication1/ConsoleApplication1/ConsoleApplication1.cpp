@@ -22,11 +22,11 @@ int main(int argc, char **argv) {
 	//TourNearestNeighborDistanceLimit tnndl3("smalltest_dl3.txt"); // Expected tours : no tours
 	//TourNearestNeighborDistanceLimit tnndl5("smalltest_dl5.txt"); // Expected tours : {0,2,1} 
 	
-	TourNearestNeighborDistanceLimit tnndl8("smalltest_dl8.txt"); // Expected tours : {0,2,3,4,1} , {0,5,1}
-	tnndl8.runShakingAndTwoopt();
+	//TourNearestNeighborDistanceLimit tnndl8("smalltest_dl8.txt"); // Expected tours : {0,2,3,4,1} , {0,5,1}
+	//tnndl8.runShakingAndTwoopt();
 
-	//TourNearestNeighborDistanceLimit tnndlbig("set_64_1_50_300.txt"); // 
-	//tnndlbig.runShakingAndTwoopt();
+	TourNearestNeighborDistanceLimit tnndlbig("set_64_1_50_300.txt"); // 
+	tnndlbig.runShakingAndTwoopt();
 
 	int k;
 	cin >> k;

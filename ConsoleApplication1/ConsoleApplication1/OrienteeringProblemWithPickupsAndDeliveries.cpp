@@ -260,13 +260,14 @@ void OrienteeringProblemWithPickupsAndDeliveries::doTwoOpt(std::vector <int>  & 
 		}
 	}
 
-
+	/*
 	cout << "The tour after 2-opt: "<< endl;
 		for(int j = 0; j < tour.size(); j++)
 		{
 			cout<<tour[j] << "   " ;
 		}
 		cout<<endl;
+	*/
 }
 
 double OrienteeringProblemWithPickupsAndDeliveries::getTourLength(vector <int> tour)
@@ -326,12 +327,14 @@ void  OrienteeringProblemWithPickupsAndDeliveries::shaking(vector <int> & tour, 
 			*/
 		}
 	}
+	/*
 	cout << "The tour after the shaking process: "<< endl;
 	for(int j = 0; j < tour.size(); j++)
 	{
 		cout<<tour[j] << "   " ;
 	}
 	cout<<endl;
+	*/
 }
 
 void OrienteeringProblemWithPickupsAndDeliveries::runShaking()

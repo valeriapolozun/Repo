@@ -110,6 +110,7 @@ void InputDataProcessor::calcDistanceMatrix()
 		}
 	}
 	
+	/*
 	cout << "The distance matrix is: "<< endl;
 	for (int i = 0; i < problemSize; i++)
 	{
@@ -119,5 +120,6 @@ void InputDataProcessor::calcDistanceMatrix()
 		}
 		cout<<endl;
 	}
+	*/
 	
 }
