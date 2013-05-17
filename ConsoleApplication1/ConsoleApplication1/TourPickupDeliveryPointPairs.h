@@ -1,5 +1,5 @@
-#ifndef __TOURFIRSTPICKUP__
-#define __TOURFIRSTPICKUP__
+#ifndef __TOURPICKUP__
+#define __TOURPICKUP__
 
 
 #include "OrienteeringProblemWithPickupsAndDeliveries.h"
@@ -7,18 +7,18 @@
 #include <string>
 #include <vector>
 
-class TourFirstPickupSecondDelivery: public OrienteeringProblemWithPickupsAndDeliveries
+class TourPickupDeliveryPointPairs: public OrienteeringProblemWithPickupsAndDeliveries
 {
 	public:
-	TourFirstPickupSecondDelivery(std::string inputFile);
-	~TourFirstPickupSecondDelivery();
+	TourPickupDeliveryPointPairs(std::string inputFile);
+	~TourPickupDeliveryPointPairs();
 
 	private:
 	void pickUpPointToChoose(std::vector<int> & nodes);
 	void calcTourChoosePickupAndDeliveryPointPairs();
 	int getPickUpDeliveryPointPairsOnePointAdded (std::vector<int> unvisitedCities, int startNode);
 	void getPickUpDeliveryPointPairsTwoPointsAdded (std::vector<int> unvisitedCities, int startNode, std::vector <int> & bestPair);
-	std::vector <int> bestPair;
+	std::vector <int> bestPairs;
 	void calcTourChoosePickupAndDeliveryPointPairs2();
 	
 
@@ -26,4 +26,3 @@ class TourFirstPickupSecondDelivery: public OrienteeringProblemWithPickupsAndDel
 
 
 #endif
-

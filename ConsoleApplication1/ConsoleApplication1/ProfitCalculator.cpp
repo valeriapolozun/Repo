@@ -48,6 +48,7 @@ void ProfitCalculator:: calculateProfit()
 double ProfitCalculator::intensityCalculation (){
 	glp_prob *lp = glp_create_prob();
 	glp_term_out(1);
+	glp_term_out(GLP_OFF);
 
 	const int N = initialTour.size();
 	const int K = N*3 + 1;
@@ -143,4 +144,17 @@ double ProfitCalculator::intensityCalculation (){
 double ProfitCalculator::getProfit()
 {
 	return result;
+}
+
+vector <int> ProfitCalculator::getZeroIntensityIndices()
+{
+	vector <int> zeroIntensityIndices;
+	for (int i=1; i < intensity.size()-1; i++)
+	{
+		if (intensity[i]==0)
+		{
+			zeroIntensityIndices.push_back(i);
+		}
+	}
+	return zeroIntensityIndices;
 }

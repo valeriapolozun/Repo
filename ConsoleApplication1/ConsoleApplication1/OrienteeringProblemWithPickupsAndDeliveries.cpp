@@ -21,6 +21,7 @@ OrienteeringProblemWithPickupsAndDeliveries::OrienteeringProblemWithPickupsAndDe
 	unvisitedNodes.assign (problemSize, 1);
 	unvisitedNodes[0]=0;
 	unvisitedNodes[1]=0;
+	numberOfTours=2;
 	
 }
 
@@ -45,17 +46,15 @@ void OrienteeringProblemWithPickupsAndDeliveries::calcPickupDeliveryPointPairs()
 	{
 		for(int j = 0; j < problemSize; j++)
 		{
-			if (i == j) travelDistance = DBL_MAX;    // define the distance from itself is a big number, so that itself can not be the nearest neighbor
+			travelDistance = inputDataProcessor.getDistance(i, j);
+			if(basicData[i].quantity*basicData[j].quantity >= 0 && basicData[i].quantity<=0)   
+			{
+				profitPerDistanceMatrix[i][j]=-DBL_MAX;
+			}
 			else
 			{
-				travelDistance = inputDataProcessor.getDistance(i, j);
+			profitPerDistanceMatrix[i][j]= ((basicData[i].profit*basicData[min(i,j)].quantity)+(basicData[j].profit*basicData[min(i,j)].quantity))-travelDistance;
 			}
-				if(basicData[i].quantity*basicData[j].quantity >= 0) 
-					profitPerDistanceMatrix[i][j]=-DBL_MAX;
-				else
-				{
-				profitPerDistanceMatrix[i][j]= ((basicData[i].profit*basicData[i].quantity)+(basicData[j].profit*basicData[j].quantity))/travelDistance;
-				}
 		}
 	}
 
@@ -72,6 +71,47 @@ void OrienteeringProblemWithPickupsAndDeliveries::calcPickupDeliveryPointPairs()
 	*/
 }
 
+
+void OrienteeringProblemWithPickupsAndDeliveries::getProfitMatrixForPickupAndDeliveryPairs(int startNode)
+	{
+	double travelDistance; // stores the calculated distances
+	double profitValueMax; // profit value per unit which can be reached by visiting a certain pair of Pick up and Delivery point
+	vector<Coordinates> basicData(inputDataProcessor.getBasicData());
+	
+
+	for (int i = 0; i < problemSize; i++)
+	{
+		for(int j = 0; j < problemSize; j++)
+		{
+			if(basicData[i].quantity*basicData[j].quantity >= 0 || basicData[i].quantity<=0 || unvisitedNodes[i]==0)   
+			{
+				profitPerDistanceMatrix[i][j]=-DBL_MAX;
+			}
+			else
+			{
+			travelDistance = inputDataProcessor.getDistance(startNode, i)+inputDataProcessor.getDistance(i, j)+inputDataProcessor.getDistance(j, 1);
+			profitPerDistanceMatrix[i][j]= ((basicData[i].profit*basicData[min(i,j)].quantity)+(basicData[j].profit*basicData[min(i,j)].quantity))-travelDistance;
+			}
+		}
+	}
+
+	for (int i = 0; i < wrongPairs.size(); i++) // Nodes which were previously tried to be added to the tour
+	{
+		profitPerDistanceMatrix[wrongPairs[i][0]] [wrongPairs[i][1]]=-DBL_MAX;
+	}
+
+	/*
+	cout << "The profitPerDistance matrix is: "<< endl;
+	for (int i = 0; i < problemSize; i++)
+	{
+		for(int j = 0; j < problemSize; j++)
+		{
+			cout<<profitPerDistanceMatrix[i][j] << "   " ;
+		}
+		cout<<endl;
+	}
+	*/
+}
 
 
 
@@ -131,6 +171,24 @@ bool OrienteeringProblemWithPickupsAndDeliveries::isTotalLengthUnderLimit(vector
 
 }
 
+bool OrienteeringProblemWithPickupsAndDeliveries::isTotalLengthUnderLimit2Nodes(vector<int> currentTour, vector <int> bestPair){
+	double result = 0;
+	int lastNode = currentTour[0];
+
+	for(int i = 0; i < bestPair.size(); i++) 
+	{
+		currentTour.push_back(bestPair[i]);
+	}
+
+	for(int i = 1; i < currentTour.size(); i++) { // The total length of the tour will be computed
+		int currentNode = currentTour[i];
+		result += inputDataProcessor.getDistance(lastNode, currentNode);
+		lastNode = currentNode;
+	}
+	result= result+ inputDataProcessor.getDistance(lastNode, 1);
+	return result<=inputDataProcessor.getMaximumTourLength(); // Is my tour length smaller than dMax. TRUE or FALSE will return
+
+}
 
 
 bool OrienteeringProblemWithPickupsAndDeliveries::isThereUnvisitedNodes()
@@ -317,9 +375,9 @@ void  OrienteeringProblemWithPickupsAndDeliveries::shaking(vector <int> & tour, 
 		for (int i=0; i< nodesToBeDisplaced.size(); i++)
 		{
 			tour.insert(tour.begin()+posToInsert+i, nodesToBeDisplaced[i]);
-			/*  TO AVOID INFEASIBLE SOLUTIONS - now not used,...at the end of the improvement I run a function 
-			which will reduce the tour until the solution is feasible
-			if (getTourLength(tour)>inputDataProcessor.getMaximumTourLength())
+			//TO AVOID INFEASIBLE SOLUTIONS - now not used,...at the end of the improvement I run a function 
+			//which will reduce the tour until the solution is feasible
+			/*if (getTourLength(tour)>inputDataProcessor.getMaximumTourLength())
 			{
 				tour.erase(tour.begin()+posToInsert+i);
 				continue;
@@ -359,6 +417,7 @@ void OrienteeringProblemWithPickupsAndDeliveries::runShakingAndTwoopt()
 			while (trials<maxTrials)
 			{
 				shaking(tour,k);
+				makeTourFeasible (tour);
 				doTwoOpt(tour);
 				ProfitCalculator newTour( tour, inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity());
 
@@ -394,24 +453,135 @@ double OrienteeringProblemWithPickupsAndDeliveries::getObjectiveValue(vector<int
 	return objectiveValue;
 }
 
-/*
-void OrienteeringProblemWithPickupsAndDeliveries::getTourFeasible(vector <int> solutionTour)
+
+void OrienteeringProblemWithPickupsAndDeliveries::makeTourFeasible(vector <int> & solutionTour)
 {
+	vector <int> zeroIntensityIndices;
+	ProfitCalculator Profit (solutionTour, inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity());
+	zeroIntensityIndices=Profit.getZeroIntensityIndices();
 	while (getTourLength(solutionTour) > inputDataProcessor.getMaximumTourLength())
 	{
-		for (int i=1; i<intensity.size()-1;i++)
+		if (zeroIntensityIndices.size()!=0)
 		{
-			if (intensity[i]=0)
-			{
-				intensity.erase(intensity.begin()+i);
-				solutionTour.erase(solutionTour.begin()+i);
-				basicDataModified.erase(basicDataModified.begin()+i);
-				break;
-			}
-
+			solutionTour.erase(solutionTour.begin()+zeroIntensityIndices.back());
+			zeroIntensityIndices.erase( zeroIntensityIndices.end()-1);
+		}
+		else
+		{
+			solutionTour.erase(solutionTour.begin()+ rand()%(solutionTour.size()-1)+1);
 		}
 	}
 }
-*/
+
+
+
+void OrienteeringProblemWithPickupsAndDeliveries::runStringExchangesAndTwoopt()
+{
+	vector < vector <int>> bestTours;
+	bestTours=solutionTours;
+	int maxTrials=1;
+	int improvement=0;
+	int tourNumber;
+	for (int i=0; i<solutionTours.size()-1;i++)  // The local search with shaking will be done for each tour 
+	{	
+		tourNumber=i;
+		vector <vector <int> > tours = solutionTours;
+		for (int k=1 ; k<4;k++)  // Neighborhood size is increasing
+		{
+
+			int trials=0;
+		ProfitCalculator bestToursProfit1 ( bestTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity());
+		ProfitCalculator bestToursProfit2 ( bestTours[i+1], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity());
+			while (trials<maxTrials)
+			{
+				stringExchanges(tours, tourNumber, k);
+				makeTourFeasible (tours[i+1]);
+				doTwoOpt(tours[i+1]);
+				ProfitCalculator newTour1( tours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity());
+				ProfitCalculator newTour2( tours[i+1], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity());
+
+				if (( newTour2.getProfit() - bestToursProfit2.getProfit())> 0)
+				{
+					bestTours[i+1]=tours [i+1];
+					bestTours[i]=tours[i];
+					improvement=improvement+1;
+				}
+
+				else
+				{
+					trials=trials+1;
+				}
+			}	
+		}
+	}
+
+	for (int i=0 ; i< solutionTours.size();i++)
+	{
+		ProfitCalculator initialToursProfit( solutionTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity()); 
+		ProfitCalculator bestToursProfit( bestTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity()); 
+		cout << "Profit of the " << i+1 << ". tour: " << initialToursProfit.getProfit() << endl;
+		cout << "Profit of the  " << i+1 << ".tour after shaking and 2opt: " << bestToursProfit.getProfit() << endl;
+		//getTourFeasible(bestTours[i]);
+	}
+	cout << "The number of improvements: " << improvement << endl;
+}
+
+
+void  OrienteeringProblemWithPickupsAndDeliveries::stringExchanges (vector < vector <int>> & tours, int tourNumber, int neighborhoodSize)
+{
+	srand (time(NULL));
+	int numberOfNodesToErase;
+	int posToErase;
+	int posToInsert;
+	vector <int> nodesToBeDisplaced;
+	numberOfNodesToErase=(rand() % neighborhoodSize)+1;
+
+	//for (int tourNumber=0; tourNumber < solutionTours.size()-1; tourNumber+= 2) // tourNumber is the index of the tour from the solutionTours from which nodes will be erased
+	//{
+		if ((tours[tourNumber].size()-2)>numberOfNodesToErase)
+		{
+			//ProfitCalculator tourInwhichNodesWillBeAddedProfit ( solutionTours[tourNumber+1], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity());
+			// 1. Erase
+			posToErase=rand()%(tours[tourNumber].size()-numberOfNodesToErase-1)+1;
+			for (int i = 0; i < numberOfNodesToErase; i++)
+			{
+				nodesToBeDisplaced.push_back(tours[tourNumber][posToErase+i]);
+			}
+
+			tours[tourNumber].erase(tours[tourNumber].begin()+posToErase, tours[tourNumber].begin()+posToErase+numberOfNodesToErase);
+	
+			
+			// 2. Choosing the best place to insert in the other tour
+			double minTourLength=DBL_MAX;
+			double TourLengthExtension;
+			for (int i = 0; i < tours[tourNumber+1].size()-1; i++)
+			{
+				TourLengthExtension= getTourLength (nodesToBeDisplaced) + inputDataProcessor.getDistance (tours[tourNumber+1][i], nodesToBeDisplaced[0])+ inputDataProcessor.getDistance (tours[tourNumber+1][i+1], nodesToBeDisplaced.back());
+				if (TourLengthExtension < minTourLength)
+				{
+					minTourLength=TourLengthExtension;
+					posToInsert= i+1;
+				}
+			
+			}
+
+			// 3. Cheapest Insertion
+
+			for (int i=0; i< nodesToBeDisplaced.size(); i++)
+			{
+				tours[tourNumber+1].insert(tours[tourNumber+1].begin()+posToInsert+i, nodesToBeDisplaced[i]);
+			}
+			//ProfitCalculator tourInwhichNodesAddedNewProfit ( solutionTours[tourNumber+1], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity());
+		}
+	//}
+	/*
+	cout << "The tour after the shaking process: "<< endl;
+	for(int j = 0; j < tour.size(); j++)
+	{
+		cout<<tour[j] << "   " ;
+	}
+	cout<<endl;
+	*/
+}
 
 

@@ -95,6 +95,7 @@
     <ClInclude Include="TourFirstPickupSecondDelivery.h" />
     <ClInclude Include="TourNearestNeighbor.h" />
     <ClInclude Include="TourNearestNeighborDistanceLimit.h" />
+    <ClInclude Include="TourPickupDeliveryPointPairs.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConsoleApplication1.cpp" />
@@ -106,6 +107,7 @@
     <ClCompile Include="TourFirstPickupSecondDelivery.cpp" />
     <ClCompile Include="TourNearestNeighbor.cpp" />
     <ClCompile Include="TourNearestNeighborDistanceLimit.cpp" />
+    <ClCompile Include="TourPickupDeliveryPointPairs.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

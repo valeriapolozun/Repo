@@ -5,6 +5,7 @@
 #include "TourNearestNeighbor.h"
 #include "TourNearestNeighborDistanceLimit.h"
 #include "TourFirstPickupSecondDelivery.h"
+#include "TourPickupDeliveryPointPairs.h"
 
 using namespace std;
 
@@ -25,8 +26,14 @@ int main(int argc, char **argv) {
 	//TourNearestNeighborDistanceLimit tnndl8("smalltest_dl8.txt"); // Expected tours : {0,2,3,4,1} , {0,5,1}
 	//tnndl8.runShakingAndTwoopt();
 
-	TourNearestNeighborDistanceLimit tnndlbig("set_64_1_50_300.txt"); // 
-	tnndlbig.runShakingAndTwoopt();
+	//TourNearestNeighborDistanceLimit tnndlbig("set_64_1_50_300kicsi.txt"); // 
+	
+	//tnndlbig.runShakingAndTwoopt();
+	//tnndlbig.runStringExchangesAndTwoopt();
+
+
+	TourPickupDeliveryPointPairs pickupdeliverypairs("set_64_1_50_300small.txt");
+
 
 	int k;
 	cin >> k;

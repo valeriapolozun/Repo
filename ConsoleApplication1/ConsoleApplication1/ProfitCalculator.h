@@ -10,6 +10,7 @@ class ProfitCalculator
 	public:
 	ProfitCalculator(std::vector <int> tourInput,std::vector <Coordinates> basicDataInput, double maxCapacityInput);
 	double getProfit();
+	std:: vector <int> getZeroIntensityIndices();
 
 	private:
 	void calculateProfit();
