@@ -51,6 +51,12 @@
     <ClInclude Include="TourPickupDeliveryPointPairs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TourPickupDeliveryPointPairsParallelBest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TourPickupDeliveryPointPairsParallel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -81,6 +87,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TourPickupDeliveryPointPairs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TourPickupDeliveryPointPairsParallelBest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TourPickupDeliveryPointPairsParallel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -17,7 +17,7 @@ class TourFirstPickupSecondDelivery: public OrienteeringProblemWithPickupsAndDel
 	void pickUpPointToChoose(std::vector<int> & nodes);
 	void calcTourChoosePickupAndDeliveryPointPairs();
 	int getPickUpDeliveryPointPairsOnePointAdded (std::vector<int> unvisitedCities, int startNode);
-	void getPickUpDeliveryPointPairsTwoPointsAdded (std::vector<int> unvisitedCities, int startNode, std::vector <int> & bestPair);
+	void getPickUpDeliveryPointPairsTwoPointsAdded (std::vector<int> unvisitedCities, int startNode, std::vector <int> & bestPair, int whichTour);
 	std::vector <int> bestPair;
 	void calcTourChoosePickupAndDeliveryPointPairs2();
 	

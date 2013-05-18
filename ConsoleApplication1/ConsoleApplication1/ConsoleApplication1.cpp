@@ -6,6 +6,8 @@
 #include "TourNearestNeighborDistanceLimit.h"
 #include "TourFirstPickupSecondDelivery.h"
 #include "TourPickupDeliveryPointPairs.h"
+#include "TourPickupDeliveryPointPairsParallelBest.h"
+#include "TourPickupDeliveryPointPairsParallel.h"
 
 using namespace std;
 
@@ -32,8 +34,13 @@ int main(int argc, char **argv) {
 	//tnndlbig.runStringExchangesAndTwoopt();
 
 
-	TourPickupDeliveryPointPairs pickupdeliverypairs("set_64_1_50_300small.txt");
 
+
+	//TourPickupDeliveryPointPairs pickupdeliverypairs("set_64_1_50_300small.txt");
+
+	//TourPickupDeliveryPointPairsParallel pickupdeliverypairsparallel("set_64_1_50_300small.txt");
+
+	TourPickupDeliveryPointPairsParallelBest pickupdeliverypairsparallelbestofalltours("set_64_1_50_300small.txt");
 
 	int k;
 	cin >> k;

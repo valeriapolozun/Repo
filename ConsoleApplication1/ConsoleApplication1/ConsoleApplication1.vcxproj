@@ -96,6 +96,8 @@
     <ClInclude Include="TourNearestNeighbor.h" />
     <ClInclude Include="TourNearestNeighborDistanceLimit.h" />
     <ClInclude Include="TourPickupDeliveryPointPairs.h" />
+    <ClInclude Include="TourPickupDeliveryPointPairsParallel.h" />
+    <ClInclude Include="TourPickupDeliveryPointPairsParallelBest.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConsoleApplication1.cpp" />
@@ -108,6 +110,8 @@
     <ClCompile Include="TourNearestNeighbor.cpp" />
     <ClCompile Include="TourNearestNeighborDistanceLimit.cpp" />
     <ClCompile Include="TourPickupDeliveryPointPairs.cpp" />
+    <ClCompile Include="TourPickupDeliveryPointPairsParallel.cpp" />
+    <ClCompile Include="TourPickupDeliveryPointPairsParallelBest.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

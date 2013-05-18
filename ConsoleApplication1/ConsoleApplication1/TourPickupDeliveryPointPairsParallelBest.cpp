@@ -1,28 +1,34 @@
-#include "TourFirstPickupSecondDelivery.h"
+#include "TourPickupDeliveryPointPairsParallelBest.h"
 #include <iostream>
 
 
 using namespace std;
 
 
-TourFirstPickupSecondDelivery::TourFirstPickupSecondDelivery(string inputFile): OrienteeringProblemWithPickupsAndDeliveries(inputFile)
+TourPickupDeliveryPointPairsParallelBest::TourPickupDeliveryPointPairsParallelBest(string inputFile): OrienteeringProblemWithPickupsAndDeliveries(inputFile)
 {
+	bestPairs.assign(2,0);
 	unvisitedNodes.assign(problemSize,1);
 	unvisitedNodes[0]=0;
 	unvisitedNodes[1]=0;
-	while (isThereUnvisitedNodes())
-	{
-		calcTourChoosePickupAndDeliveryPointPairs();
-	} 
+	calcTourChoosePickupAndDeliveryPointPairs2();
+	
 
 	profitsOfAllTheTours();
+	for (int i=0; i<solutionTours.size();i++)
+	{
+		cout << "The tour length of the " << i+1 << ". tour is: " << getTourLength(solutionTours[i]) << endl;
+	} 
+
+
+
 }
 
-TourFirstPickupSecondDelivery::~TourFirstPickupSecondDelivery()
+TourPickupDeliveryPointPairsParallelBest::~TourPickupDeliveryPointPairsParallelBest()
 {
 }
 
-void TourFirstPickupSecondDelivery::pickUpPointToChoose(vector<int> & nodes)
+void TourPickupDeliveryPointPairsParallelBest::pickUpPointToChoose(vector<int> & nodes)
 {
 	for (int i=0; i<nodes.size();i++)
 	{
@@ -33,7 +39,7 @@ void TourFirstPickupSecondDelivery::pickUpPointToChoose(vector<int> & nodes)
 
 
 
-void TourFirstPickupSecondDelivery::calcTourChoosePickupAndDeliveryPointPairs(){
+void TourPickupDeliveryPointPairsParallelBest::calcTourChoosePickupAndDeliveryPointPairs(){
 	vector<int> unvisitedNodesForOneTour;
 
 	unvisitedNodesForOneTour= unvisitedNodes;
@@ -93,22 +99,30 @@ void TourFirstPickupSecondDelivery::calcTourChoosePickupAndDeliveryPointPairs(){
 }
 
 
-/*
-void TourFirstPickupSecondDelivery::calcTourChoosePickupAndDeliveryPointPairs2(){
+
+void TourPickupDeliveryPointPairsParallelBest::calcTourChoosePickupAndDeliveryPointPairs2(){
 	vector<int> unvisitedNodesForOneTour;
 
 	unvisitedNodesForOneTour= unvisitedNodes;
-	
+	double additionalDistance;
+	double min;
+	int minpos;
+
+
 	int startNode=0;
 	vector<int> tour;
 	tour.push_back(0);
 
-	unvisitedNodesForOneTour= unvisitedNodes;
+
+	for (int i = 0; i < numberOfTours; i++)
+	{
+		solutionTours.push_back(tour);
+	}
+
+
 	unvisitedNodesForOneTour[0]=0;
 	unvisitedNodesForOneTour[1]=0;
-
-
-
+	
 	/*
 	pickUpPointToChoose(unvisitedNodesForOneTour);
 	
@@ -120,11 +134,11 @@ void TourFirstPickupSecondDelivery::calcTourChoosePickupAndDeliveryPointPairs2()
 		unvisitedNodesForOneTour[0]=0;
 		unvisitedNodesForOneTour[1]=0;
 		unvisitedNodesForOneTour[startNode]=0;
-
+	*/
 
 	for (int i = 0; i < (problemSize-2); i++)  /// TO DO : Calculate how many times it should run (problemSize-2) is wrong
 	{
-		getPickUpDeliveryPointPairsTwoPointsAdded(unvisitedNodesForOneTour, tour.back(), bestPair);
+		//getPickUpDeliveryPointPairsTwoPointsAdded(unvisitedNodes, tour.back(), bestPairs);
 
 	/*
 		startNode=getPickUpDeliveryPointPairsOnePointAdded(unvisitedNodesForOneTour, tour.back());
@@ -133,29 +147,53 @@ void TourFirstPickupSecondDelivery::calcTourChoosePickupAndDeliveryPointPairs2()
 		}
 		else
 		{
-	
-		if (!bestPair.empty())
+	*/
+		getPickUpDeliveryPointPairs(unvisitedNodes, bestPairs);
+
+		if (!bestPairs[0]==0)
 		{
-			if (isTotalLengthUnderLimit2Nodes(tour, bestPair))
+			min=DBL_MAX;
+			for (int i = 0; i < numberOfTours; i++)
 			{
-				for (int i = 0; i < bestPair.size(); i++)
+				
+				additionalDistance=inputDataProcessor.getDistance( solutionTours[i].back(), bestPairs[0]) + inputDataProcessor.getDistance( bestPairs[1], 1);
+				if (additionalDistance <min)
 				{
-					tour.push_back(bestPair[i]);
+					min=additionalDistance;
+					minpos= i;
 				}
 			}
-			unvisitedNodesForOneTour[bestPair[i]]=0;
-			bestPair.erase (bestPair.begin(),bestPair.begin()+1);
+
+			if (isTotalLengthUnderLimit2Nodes(solutionTours[minpos], bestPairs))
+			{
+				for (int i = 0; i < bestPairs.size(); i++)
+				{
+					solutionTours[minpos].push_back(bestPairs[i]);
+					//unvisitedNodesForOneTour[bestPairs[i]]=0;
+					unvisitedNodes[bestPairs[i]]=0;
+				}
+			}
+			else
+			{
+			wrongPairs[minpos].push_back(bestPairs);
+			}
+			bestPairs[0]=0;
+			bestPairs[1]=0;
+			;
 		}
 	}
 	
-	tour.push_back(1);
-
-	
+	for (int i = 0; i < numberOfTours; i++)
+	{
+		solutionTours[i].push_back(1);
+	}
+	/*
 	for (int i=0; i < tour.size(); i++)
 	{
 		unvisitedNodes[tour[i]]=0;
 	}
-
+	*/
+	/*
 	if (tour.size()==2)
 	{
 		unvisitedNodes.assign(problemSize, 0);
@@ -169,12 +207,12 @@ void TourFirstPickupSecondDelivery::calcTourChoosePickupAndDeliveryPointPairs2()
 			cout  << i+1 << ". place in the tour " << tour[i] << endl;
 		}
 	}
-	
+	*/
 }
 
-*/
 
-int TourFirstPickupSecondDelivery::getPickUpDeliveryPointPairsOnePointAdded (vector<int> unvisitedCities, int startNode)
+
+int TourPickupDeliveryPointPairsParallelBest::getPickUpDeliveryPointPairsOnePointAdded (vector<int> unvisitedCities, int startNode)
 {
     double max = -DBL_MAX;
     int best = startNode;
@@ -194,16 +232,17 @@ int TourFirstPickupSecondDelivery::getPickUpDeliveryPointPairsOnePointAdded (vec
 }
 
 
-void TourFirstPickupSecondDelivery::getPickUpDeliveryPointPairsTwoPointsAdded (vector<int> unvisitedCities, int startNode, vector <int> & bestPair, int whichTour)
+void TourPickupDeliveryPointPairsParallelBest::getPickUpDeliveryPointPairsTwoPointsAdded (vector<int> unvisitedCities, int startNode, vector <int> & bestPairs, int whichTour)
 {
     double max = -DBL_MAX;
     //int best = startNode;
     
 	for(int i=0; i<unvisitedCities.size(); i++)
     {
+		if(unvisitedCities[i]==0) continue; 
 		for(int j=0; j<unvisitedCities.size(); j++)
 		{
-			if(unvisitedCities[i]==0) continue; 
+			if(unvisitedCities[j]==0) continue; 
 			if (startNode == i) continue; 
 			if (startNode == j) continue; 
 			getProfitMatrixForPickupAndDeliveryPairs (startNode, whichTour);
@@ -211,8 +250,8 @@ void TourFirstPickupSecondDelivery::getPickUpDeliveryPointPairsTwoPointsAdded (v
 			if(profitPerDistanceMatrix[i][j]>max)
 			{			
             max = profitPerDistanceMatrix[i][j];
-			bestPair[0]=i;
-			bestPair[1]=j;
+			bestPairs[0]=i;
+			bestPairs[1]=j;
 			}
 		 }
     }
@@ -221,3 +260,29 @@ void TourFirstPickupSecondDelivery::getPickUpDeliveryPointPairsTwoPointsAdded (v
    return;
 }
 
+
+void TourPickupDeliveryPointPairsParallelBest::getPickUpDeliveryPointPairs (std::vector<int> unvisitedCities, std::vector <int> & bestPair) 
+{
+    double max = -DBL_MAX;
+    //int best = startNode;
+    
+	for(int i=0; i<unvisitedCities.size(); i++)
+    {
+		if(unvisitedCities[i]==0) continue; 
+		for(int j=0; j<unvisitedCities.size(); j++)
+		{
+			if(unvisitedCities[j]==0) continue; 
+			getProfitMatrixForPickupAndDeliveryPairsParallelBest();
+			//cout << "the i: " << i << "the profitperdistancematrix[startnode][i]" << profitPerDistanceMatrix[startNode][i] << " a max value: " << max << endl;
+			if(profitPerDistanceMatrix[i][j]>max)
+			{			
+            max = profitPerDistanceMatrix[i][j];
+			bestPairs[0]=i;
+			bestPairs[1]=j;
+			}
+		 }
+    }
+
+	//cout << "The next nearest point is: " << nearest << endl;
+   return;
+}

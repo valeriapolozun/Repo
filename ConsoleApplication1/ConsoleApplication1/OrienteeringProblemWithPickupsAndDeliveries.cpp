@@ -21,7 +21,14 @@ OrienteeringProblemWithPickupsAndDeliveries::OrienteeringProblemWithPickupsAndDe
 	unvisitedNodes.assign (problemSize, 1);
 	unvisitedNodes[0]=0;
 	unvisitedNodes[1]=0;
-	numberOfTours=2;
+	numberOfTours=3;
+	wrongPairs.resize(numberOfTours);
+	vector <int> twotimeszero;
+	twotimeszero.assign(2,0);
+	for (int i = 0; i < numberOfTours; i++)
+	{
+		wrongPairs[i].push_back(twotimeszero);
+	}
 	
 }
 
@@ -72,7 +79,7 @@ void OrienteeringProblemWithPickupsAndDeliveries::calcPickupDeliveryPointPairs()
 }
 
 
-void OrienteeringProblemWithPickupsAndDeliveries::getProfitMatrixForPickupAndDeliveryPairs(int startNode)
+void OrienteeringProblemWithPickupsAndDeliveries::getProfitMatrixForPickupAndDeliveryPairs(int startNode, int whichTour)
 	{
 	double travelDistance; // stores the calculated distances
 	double profitValueMax; // profit value per unit which can be reached by visiting a certain pair of Pick up and Delivery point
@@ -94,10 +101,12 @@ void OrienteeringProblemWithPickupsAndDeliveries::getProfitMatrixForPickupAndDel
 			}
 		}
 	}
-
-	for (int i = 0; i < wrongPairs.size(); i++) // Nodes which were previously tried to be added to the tour
+	if (!wrongPairs.empty())
 	{
-		profitPerDistanceMatrix[wrongPairs[i][0]] [wrongPairs[i][1]]=-DBL_MAX;
+	for (int i = 0; i < wrongPairs[whichTour].size(); i++) // Nodes which were previously tried to be added to the tour
+	{
+		profitPerDistanceMatrix[wrongPairs[whichTour][i][0]] [wrongPairs[whichTour][i][1]]=-DBL_MAX;
+	}
 	}
 
 	/*
@@ -114,6 +123,95 @@ void OrienteeringProblemWithPickupsAndDeliveries::getProfitMatrixForPickupAndDel
 }
 
 
+void OrienteeringProblemWithPickupsAndDeliveries::getProfitMatrixForPickupAndDeliveryPairsParallel(int whichTour)
+	{
+	double travelDistance; // stores the calculated distances
+	double profitValueMax; // profit value per unit which can be reached by visiting a certain pair of Pick up and Delivery point
+	vector<Coordinates> basicData(inputDataProcessor.getBasicData());
+	
+
+	for (int i = 0; i < problemSize; i++)
+	{
+		for(int j = 0; j < problemSize; j++)
+		{
+			if(basicData[i].quantity*basicData[j].quantity >= 0 || basicData[i].quantity<=0 || unvisitedNodes[i]==0)   
+			{
+				profitPerDistanceMatrix[i][j]=-DBL_MAX;
+			}
+			else
+			{
+			profitPerDistanceMatrix[i][j]= ((basicData[i].profit*basicData[min(i,j)].quantity)+(basicData[j].profit*basicData[min(i,j)].quantity));
+			}
+		}
+	}
+
+	for (int i = 0; i < wrongPairs[whichTour].size(); i++) // Nodes which were previously tried to be added to the tour
+	{
+		if ( wrongPairs[whichTour][i][0]!=0 && wrongPairs[whichTour][i][1]!=0)
+		{
+			profitPerDistanceMatrix[wrongPairs[whichTour][i][0]] [wrongPairs[whichTour][i][1]]=-DBL_MAX;
+		}
+	}
+
+	/*
+	cout << "The profitPerDistance matrix is: "<< endl;
+	for (int i = 0; i < problemSize; i++)
+	{
+		for(int j = 0; j < problemSize; j++)
+		{
+			cout<<profitPerDistanceMatrix[i][j] << "   " ;
+		}
+		cout<<endl;
+	}
+	*/
+}
+
+
+void OrienteeringProblemWithPickupsAndDeliveries::getProfitMatrixForPickupAndDeliveryPairsParallelBest()
+	{
+	double travelDistance; // stores the calculated distances
+	double profitValueMax; // profit value per unit which can be reached by visiting a certain pair of Pick up and Delivery point
+	vector<Coordinates> basicData(inputDataProcessor.getBasicData());
+	
+
+	for (int i = 0; i < problemSize; i++)
+	{
+		for(int j = 0; j < problemSize; j++)
+		{
+			if(basicData[i].quantity*basicData[j].quantity >= 0 || basicData[i].quantity<=0 || unvisitedNodes[i]==0)   
+			{
+				profitPerDistanceMatrix[i][j]=-DBL_MAX;
+			}
+			else
+			{
+			profitPerDistanceMatrix[i][j]= ((basicData[i].profit*basicData[min(i,j)].quantity)+(basicData[j].profit*basicData[min(i,j)].quantity));
+			}
+		}
+	}
+
+	/*
+	for (int i = 0; i < wrongPairs[whichTour].size(); i++) // Nodes which were previously tried to be added to the tour
+	{
+		if ( wrongPairs[whichTour][i][0]!=0 && wrongPairs[whichTour][i][1]!=0)
+		{
+			profitPerDistanceMatrix[wrongPairs[whichTour][i][0]] [wrongPairs[whichTour][i][1]]=-DBL_MAX;
+		}
+	}
+
+	*/
+
+	/*
+	cout << "The profitPerDistance matrix is: "<< endl;
+	for (int i = 0; i < problemSize; i++)
+	{
+		for(int j = 0; j < problemSize; j++)
+		{
+			cout<<profitPerDistanceMatrix[i][j] << "   " ;
+		}
+		cout<<endl;
+	}
+	*/
+}
 
 
 

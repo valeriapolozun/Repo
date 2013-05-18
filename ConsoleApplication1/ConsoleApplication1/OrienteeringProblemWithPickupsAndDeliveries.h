@@ -36,10 +36,15 @@ protected:
 	bool isTotalLengthUnderLimit(std::vector<int> currentTour, int nodeToAdd);
 	bool isTotalLengthUnderLimit2Nodes(std::vector<int> currentTour, std::vector <int> nodesToAdd);
 	std::vector < std::vector <double> > profitPerDistanceMatrix;
-	void getProfitMatrixForPickupAndDeliveryPairs(int startNode);
+	void getProfitMatrixForPickupAndDeliveryPairs(int startNode, int whichTour);
 	int numberOfTours;
-	std::vector <std::vector <int> > wrongPairs; 
+	std::vector <std::vector <std::vector <int> > > wrongPairs;
+	std::vector <std::vector <int> > wrongPairsForOneTour;  // Vector which includes the pair which can not be added to one certain tour
 	double getTourLength(std::vector <int> tour);
+	void getProfitMatrixForPickupAndDeliveryPairsParallel(int whichTour);
+	void getProfitMatrixForPickupAndDeliveryPairsParallelBest();
+
+
 
 private:
 	
