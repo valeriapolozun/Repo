@@ -39,65 +39,6 @@ void TourPickupDeliveryPointPairsParallelBest::pickUpPointToChoose(vector<int> &
 
 
 
-void TourPickupDeliveryPointPairsParallelBest::calcTourChoosePickupAndDeliveryPointPairs(){
-	vector<int> unvisitedNodesForOneTour;
-
-	unvisitedNodesForOneTour= unvisitedNodes;
-	
-	int startNode=0;
-	vector<int> tour;
-	tour.push_back(0);
-	
-	pickUpPointToChoose(unvisitedNodesForOneTour);
-	
-	startNode= getNearestNeighbor(unvisitedNodesForOneTour, startNode);
-	if (startNode!=0){	
-		tour.push_back(startNode);
-		
-		unvisitedNodesForOneTour= unvisitedNodes;
-		unvisitedNodesForOneTour[0]=0;
-		unvisitedNodesForOneTour[1]=0;
-		unvisitedNodesForOneTour[startNode]=0;
-
-	for (int i = 0; i < problemSize-3; i++)
-	{
-		startNode=getPickUpDeliveryPointPairsOnePointAdded(unvisitedNodesForOneTour, tour.back());
-		if (startNode==0){
-			continue;
-		}
-		else
-		{
-			if (isTotalLengthUnderLimit(tour, startNode)){
-			tour.push_back(startNode);
-			}
-		unvisitedNodesForOneTour[startNode]=0;
-		}
-	}
-	}
-	tour.push_back(1);
-
-	
-	for (int i=0; i < tour.size(); i++)
-	{
-		unvisitedNodes[tour[i]]=0;
-	}
-
-	if (tour.size()==2)
-	{
-		unvisitedNodes.assign(problemSize, 0);
-	}
-	else 
-	{
-		solutionTours.push_back(tour);
-
-		for (int i = 0; i < tour.size(); i++)
-		{
-			cout  << i+1 << ". place in the tour " << tour[i] << endl;
-		}
-	}
-	
-}
-
 
 
 void TourPickupDeliveryPointPairsParallelBest::calcTourChoosePickupAndDeliveryPointPairs2(){

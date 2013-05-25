@@ -29,6 +29,12 @@ OrienteeringProblemWithPickupsAndDeliveries::OrienteeringProblemWithPickupsAndDe
 	{
 		wrongPairs[i].push_back(twotimeszero);
 	}
+	rexe="\"C:/Program Files/R/R-2.15.2/bin/R\"";
+	rpath="C:/Users/User/Documents/Visual Studio 2012/Projects/Repo/ConsoleApplication1/Rfiles/";
+	filename="empty";
+	
+
+
 	
 }
 
@@ -301,6 +307,7 @@ void OrienteeringProblemWithPickupsAndDeliveries::profitsOfAllTheTours()
 	{
 		ProfitCalculator initialToursProfit( solutionTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity()); 
 		cout << "Profit of the " << i+1 << ". tour: " << initialToursProfit.getProfit() << endl;
+		Rprintsol(rexe, rpath, filename, initialToursProfit);
 		result= result+ initialToursProfit.getProfit();
 	}
 	cout << "The total profit of the tours all together :  " << result << endl;
@@ -682,4 +689,37 @@ void  OrienteeringProblemWithPickupsAndDeliveries::stringExchanges (vector < vec
 	*/
 }
 
+
+void  OrienteeringProblemWithPickupsAndDeliveries::Rprintsol(string rexe, string rpath, string filename, ProfitCalculator solution){
+	
+	solution.savesol( rpath + "example1.txt");
+	inputDataProcessor.Rsavesinstance(rpath + "example2.txt");		
+
+	int lastchar = filename.find_first_of(".")-1;
+	string filetrunc = string(filename.substr(0,lastchar));
+	//string fnamesolcplex =  filetrunc + "_" + extension + ".pdf";
+
+	string syscommand(rexe);
+	syscommand = syscommand + " -f " + rpath + "start.r";
+	replace(syscommand.begin(),syscommand.end(),'/','\\');
+	system(syscommand.c_str());
+	syscommand = std::string("echo ") + syscommand;
+	system(syscommand.c_str());
+	// system("\"C:/Program Files/R/R-2.15.0/bin/R\" -f C:/Users/martin/Desktop/projects/pickupanddeliveryteamorienteering/R/start.r");
+		
+	syscommand = string("del ");
+	//syscommand = syscommand + rpath + fnamesolcplex;
+	replace(syscommand.begin(),syscommand.end(),'/','\\');
+	system(syscommand.c_str());
+	syscommand = std::string("echo ") + syscommand;
+	system(syscommand.c_str());
+	
+	syscommand = string("ren ");
+	//syscommand = syscommand + rpath + "test123.pdf " + fnamesolcplex;
+	replace(syscommand.begin(),syscommand.end(),'/','\\');
+	system(syscommand.c_str()); 
+	syscommand = std::string("echo ") + syscommand;
+	system(syscommand.c_str());
+
+}
 

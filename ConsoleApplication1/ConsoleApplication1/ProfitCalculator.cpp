@@ -1,11 +1,18 @@
 #include "ProfitCalculator.h"
+#include "InputDataProcessor.h"
 #include <glpk.h>
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
 ProfitCalculator:: ProfitCalculator(std::vector <int> tourInput,std::vector <Coordinates> basicDataInput, double maxCapacityInput) 
 {
+	upperbound = - 1;
+	CPUtime = 0;
+	Iteratations = 0;
+	CPUtimetotal = 0;
+
 	tour=tourInput;
 	maxCapacity= maxCapacityInput;
 	for (int i = 0; i < tour.size(); i++)
@@ -21,7 +28,7 @@ void ProfitCalculator:: calculateProfit()
 	
 	for (int i = 0; i < basicData.size(); i++)
 	{
-		initialTour.push_back(basicData[i].quantity);
+		vectorMaxQuantities.push_back(basicData[i].quantity);
 	}
 
 
@@ -50,7 +57,7 @@ double ProfitCalculator::intensityCalculation (){
 	glp_term_out(1);
 	glp_term_out(GLP_OFF);
 
-	const int N = initialTour.size();
+	const int N = vectorMaxQuantities.size();
 	const int K = N*3 + 1;
 
 	// int *[K], ja[K];
@@ -110,7 +117,7 @@ double ProfitCalculator::intensityCalculation (){
 		++k;
 		ia[k] = i;
 		ja[k] = N+i;
-		ar[k] = -initialTour[i-2];
+		ar[k] = -vectorMaxQuantities[i-2];
 
 		++k;
 	}
@@ -158,3 +165,40 @@ vector <int> ProfitCalculator::getZeroIntensityIndices()
 	}
 	return zeroIntensityIndices;
 }
+
+
+void ProfitCalculator::savesol(string fname)
+{
+		ofstream myfile;
+		myfile.open (fname);
+		myfile << "result = list() " << endl;
+
+
+		myfile << "result$profit =  " << result << endl;
+		myfile << "result$bound = " << upperbound << endl;
+		myfile << "result$length = " << 50 << endl;
+		myfile << "result$maxload = " << 300 << endl;
+		myfile << "result$cputime = " << CPUtime << endl;
+		myfile << "result$cputimetotal = " << CPUtimetotal << endl;
+		myfile << "result$iterations = " << Iteratations << endl;
+		myfile << "result$tour = c(";
+		for(int i = 0; i < tour.size()-1; i++){
+			myfile << 1 + tour[i] << ", ";
+		}
+		myfile << 1 + tour[tour.size()-1] << ")" << endl;
+		myfile << "result$intensity = c(";
+		for(int i = 0; i < intensity.size()-1; i++){
+			myfile << intensity[i] << ", ";
+		}
+		myfile << intensity[intensity.size()-1] << ")" << endl;
+		myfile << "result$quantity = c(";
+		for(int i = 0; i < tour.size()-1; i++){
+			myfile << intensity[i]* basicData[i].quantity << ", ";
+		}
+		myfile << intensity[tour.size()-1]*basicData[tour.size()-1].quantity << ")" << endl;
+		myfile.close();
+	};
+
+
+
+

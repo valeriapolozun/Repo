@@ -4,6 +4,8 @@
 
 #include "Coordinates.h"
 #include <vector>
+#include <string>
+using namespace std;
 
 class ProfitCalculator
 {
@@ -11,6 +13,7 @@ class ProfitCalculator
 	ProfitCalculator(std::vector <int> tourInput,std::vector <Coordinates> basicDataInput, double maxCapacityInput);
 	double getProfit();
 	std:: vector <int> getZeroIntensityIndices();
+	void savesol(string fname);
 
 	private:
 	void calculateProfit();
@@ -19,12 +22,18 @@ class ProfitCalculator
 	std:: vector<int> tour;
 	double maxCapacity;
 	std:: vector<Coordinates> basicData;
-	std::vector <double> initialTour; // TODO change name
+	std::vector <double> vectorMaxQuantities;
 	std::vector <double> maxProfits;
 	std::vector<double> intensity;
 	double result;
-};
+	int upperbound;
+	double CPUtime;
+	int Iteratations;
+	double CPUtimetotal;
 
+
+
+};
 
 
 #endif

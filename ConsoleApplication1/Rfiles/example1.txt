@@ -1,0 +1,11 @@
+result = list() 
+result$profit =  2832
+result$bound = -1
+result$length = 50
+result$maxload = 300
+result$cputime = 0
+result$cputimetotal = 0
+result$iterations = 0
+result$tour = c(1, 7, 6, 9, 8, 4, 3, 10, 17, 2)
+result$intensity = c(0, 0.5, 1, 1, 1, 0, 1, 1, 1, 0)
+result$quantity = c(0, 6, -6, 12, -6, 0, -6, 18, -18, 0)

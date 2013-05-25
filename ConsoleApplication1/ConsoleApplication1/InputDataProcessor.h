@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include "Coordinates.h"
+using namespace std;
 
 
 class InputDataProcessor
@@ -16,6 +17,8 @@ public:
 	const std::vector<Coordinates>& getBasicData();
 	int getProblemSize();
 	double getDistance(int from, int to);
+	void Rsavesinstance(std::string fname);
+
 
 protected:
 	double dMax; // maximum tour length

@@ -123,3 +123,40 @@ void InputDataProcessor::calcDistanceMatrix()
 	*/
 	
 }
+
+
+void InputDataProcessor::Rsavesinstance(string fname){
+		ofstream myfile;
+		myfile.open (fname);
+		myfile << "tmax = " << getMaximumTourLength()<< endl;
+		myfile << "lmax = " << getMaximumLoadCapacity() << endl;
+		myfile << "instance1 = rbind(" << endl;
+		int n=basicData.size();
+		for(int i = 0; i < n-1; i++){
+			myfile << "c(";
+			myfile << basicData[i].x << ", " << basicData[i].y<< ", " << basicData[i].quantity<< ", "  << basicData[i].profit ;
+			myfile << "), " << endl;
+		}
+		myfile << "c(" << basicData[n-1].x << ", " << basicData[n-1].y<< ", " << basicData[n-1].quantity << ", "  << basicData[n-1].profit  << endl;
+		myfile << ") ) " << endl;
+		
+		myfile << "tcost = rbind(" << endl;
+		for(int i = 0; i < n-1; i++){
+			myfile << "c(";
+			for(int j = 0; j < n-1; j++){
+				myfile << distanceMatrix[i][j] << ", ";
+			}
+			myfile << distanceMatrix[i][n-1] << " ), " << endl;
+		}
+		myfile << "c(";
+		for(int j = 0; j < n-1; j++){
+			myfile << distanceMatrix[n-1][j] << ", ";
+		}
+		myfile << distanceMatrix[n-1][n-1] << " ) " << endl;
+		myfile << ") " << endl;
+
+		myfile.close();
+};
+
+
+

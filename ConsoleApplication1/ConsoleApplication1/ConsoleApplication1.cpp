@@ -8,6 +8,7 @@
 #include "TourPickupDeliveryPointPairs.h"
 #include "TourPickupDeliveryPointPairsParallelBest.h"
 #include "TourPickupDeliveryPointPairsParallel.h"
+#include "TourGreedyEinzelnePunkteSeriell.h"
 
 using namespace std;
 
@@ -33,14 +34,18 @@ int main(int argc, char **argv) {
 	//tnndlbig.runShakingAndTwoopt();
 	//tnndlbig.runStringExchangesAndTwoopt();
 
-
-
-
-	//TourPickupDeliveryPointPairs pickupdeliverypairs("set_64_1_50_300small.txt");
+	
+	
+	TourPickupDeliveryPointPairs pickupdeliverypairs("set_64_1_50_300small.txt");
 
 	//TourPickupDeliveryPointPairsParallel pickupdeliverypairsparallel("set_64_1_50_300small.txt");
 
-	TourPickupDeliveryPointPairsParallelBest pickupdeliverypairsparallelbestofalltours("set_64_1_50_300small.txt");
+	//TourPickupDeliveryPointPairsParallelBest pickupdeliverypairsparallelbestofalltours("set_64_1_50_300small.txt");
+
+	//TourGreedyEinzelnePunkteSeriell tourgreedyeinzeln("set_64_1_50_300small.txt");
+
+
+
 
 	int k;
 	cin >> k;

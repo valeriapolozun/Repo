@@ -25,6 +25,20 @@ public:
 	void runShakingAndTwoopt();
 	double getObjectiveValue(std::vector <int> tour); // Profit minus Cost
 	void runStringExchangesAndTwoopt();
+	string rexe;
+	string rpath;
+	string filename;
+	//string extension;
+	
+	
+	void Rprintsol(string rexe, string rpath, string filename, ProfitCalculator solution);
+
+
+
+
+
+
+
 
 protected:
 
@@ -56,6 +70,8 @@ private:
 	void shaking(std::vector <int> & tour, int neighborhoodSize);
 	void makeTourFeasible(std::vector <int> & solutionTour);
 	void stringExchanges(std::vector <std::vector <int> > & tours,int tourNumber, int neighborhoodSize);
+
+	
 
 
 	

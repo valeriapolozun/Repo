@@ -15,7 +15,6 @@ class TourPickupDeliveryPointPairsParallelBest: public OrienteeringProblemWithPi
 
 	private:
 	void pickUpPointToChoose(std::vector<int> & nodes);
-	void calcTourChoosePickupAndDeliveryPointPairs();
 	int getPickUpDeliveryPointPairsOnePointAdded (std::vector<int> unvisitedCities, int startNode);
 	void getPickUpDeliveryPointPairsTwoPointsAdded (std::vector<int> unvisitedCities, int startNode, std::vector <int> & bestPair, int whichTour);
 	std::vector <int> bestPairs;

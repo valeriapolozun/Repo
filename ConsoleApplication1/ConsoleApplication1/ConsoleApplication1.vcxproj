@@ -86,6 +86,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Coordinates.h" />
+    <ClInclude Include="ExportSolution.h" />
     <ClInclude Include="InputDataProcessor.h" />
     <ClInclude Include="OrienteeringProblemWithPickupsAndDeliveries.h" />
     <ClInclude Include="ProfitCalculator.h" />
@@ -93,6 +94,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TourDefault.h" />
     <ClInclude Include="TourFirstPickupSecondDelivery.h" />
+    <ClInclude Include="TourGreedyEinzelnePunkteSeriell.h" />
     <ClInclude Include="TourNearestNeighbor.h" />
     <ClInclude Include="TourNearestNeighborDistanceLimit.h" />
     <ClInclude Include="TourPickupDeliveryPointPairs.h" />
@@ -101,12 +103,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConsoleApplication1.cpp" />
+    <ClCompile Include="ExportSolution.cpp" />
     <ClCompile Include="InputDataProcessor.cpp" />
     <ClCompile Include="OrienteeringProblemWithPickupsAndDeliveries.cpp" />
     <ClCompile Include="ProfitCalculator.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="TourDefault.cpp" />
     <ClCompile Include="TourFirstPickupSecondDelivery.cpp" />
+    <ClCompile Include="TourGreedyEinzelnePunkteSeriell.cpp" />
     <ClCompile Include="TourNearestNeighbor.cpp" />
     <ClCompile Include="TourNearestNeighborDistanceLimit.cpp" />
     <ClCompile Include="TourPickupDeliveryPointPairs.cpp" />
