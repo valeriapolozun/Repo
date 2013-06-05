@@ -86,8 +86,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Coordinates.h" />
-    <ClInclude Include="ExportSolution.h" />
     <ClInclude Include="InputDataProcessor.h" />
+    <ClInclude Include="LoadCalculator.h" />
     <ClInclude Include="OrienteeringProblemWithPickupsAndDeliveries.h" />
     <ClInclude Include="ProfitCalculator.h" />
     <ClInclude Include="stdafx.h" />
@@ -103,10 +103,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConsoleApplication1.cpp" />
-    <ClCompile Include="ExportSolution.cpp" />
     <ClCompile Include="InputDataProcessor.cpp" />
     <ClCompile Include="OrienteeringProblemWithPickupsAndDeliveries.cpp" />
     <ClCompile Include="ProfitCalculator.cpp" />
+    <ClCompile Include="LoadCalculator.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="TourDefault.cpp" />
     <ClCompile Include="TourFirstPickupSecondDelivery.cpp" />

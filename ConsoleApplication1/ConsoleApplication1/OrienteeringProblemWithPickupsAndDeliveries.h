@@ -31,10 +31,12 @@ public:
 	//string extension;
 	
 	
-	void Rprintsol(string rexe, string rpath, string filename, ProfitCalculator solution);
+	void Rprintsol(string rexe, string rpath, string filename, ProfitCalculator solution, int i);
 
-
-
+	void doTwoOpt(std::vector <int>  & tour);
+	void erasePoints(int neighborhoodSize, double percentageToErase);
+	void insertPoints(vector<Coordinates> basicData, vector <int> tour);
+	bool isZero (int i);
 
 
 
@@ -57,7 +59,11 @@ protected:
 	double getTourLength(std::vector <int> tour);
 	void getProfitMatrixForPickupAndDeliveryPairsParallel(int whichTour);
 	void getProfitMatrixForPickupAndDeliveryPairsParallelBest();
-
+	vector <int> load;
+	vector <int> goodsOnTheLorry;
+	
+	vector <int> bufferPlus;
+	vector <int> bufferMinus;
 
 
 private:
@@ -65,7 +71,7 @@ private:
 	void initProfitPerDistanceMatrix();
 	void calcPickupDeliveryPointPairs();
 	int getHighestDemandInNeighborhood(std::vector<int> unvisitedCities, int startNode);
-	void doTwoOpt(std::vector <int>  & tour);
+	
 	void changeOrderPartOfTour( std::vector <int> & tour, int from, int to);
 	void shaking(std::vector <int> & tour, int neighborhoodSize);
 	void makeTourFeasible(std::vector <int> & solutionTour);

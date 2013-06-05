@@ -21,6 +21,7 @@ ProfitCalculator:: ProfitCalculator(std::vector <int> tourInput,std::vector <Coo
 	}
 	result=0;
 	calculateProfit();
+
 }
 
 void ProfitCalculator:: calculateProfit()
@@ -165,6 +166,61 @@ vector <int> ProfitCalculator::getZeroIntensityIndices()
 	}
 	return zeroIntensityIndices;
 }
+
+void ProfitCalculator::loadCalculation(vector <int> & load, vector <int> & goodsOnTheLorry)
+{
+	load.push_back(0);
+	goodsOnTheLorry.push_back(0);
+	for (int i=1; i < intensity.size(); i++)
+	{
+		 load.push_back(intensity[i]*basicData[i].quantity);
+		 goodsOnTheLorry.push_back( goodsOnTheLorry[i-1]+ load[i]);
+	}
+}
+
+
+void ProfitCalculator::bufferPlusCalculation(vector <int> goodsOnTheLorry, vector <int> & bufferPlus)
+{
+	double min;
+	for (int i=0; i < goodsOnTheLorry.size(); i++)
+	{
+		min=maxCapacity;
+		for (int j=i; j < goodsOnTheLorry.size(); j++)
+		{
+			if (min> maxCapacity-goodsOnTheLorry[j])
+			{
+				min=maxCapacity-goodsOnTheLorry[j];
+			}
+		}	
+		bufferPlus.push_back(min);
+		
+	}
+}
+
+void ProfitCalculator::bufferMinusCalculation ( vector <int> goodsOnTheLorry, vector <int> & bufferMinus)
+{
+	double max;
+	for (int i=0; i < goodsOnTheLorry.size(); i++)
+	{
+		max=0;
+		for (int j=i; j < goodsOnTheLorry.size(); j++)
+		{
+			if (max < goodsOnTheLorry[j])
+			{
+				max=goodsOnTheLorry[j];
+			}
+		}
+		
+		 bufferMinus.push_back(max);
+	}	
+}
+
+
+
+
+
+
+
 
 
 void ProfitCalculator::savesol(string fname)

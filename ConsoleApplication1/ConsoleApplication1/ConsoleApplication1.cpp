@@ -29,20 +29,42 @@ int main(int argc, char **argv) {
 	//TourNearestNeighborDistanceLimit tnndl8("smalltest_dl8.txt"); // Expected tours : {0,2,3,4,1} , {0,5,1}
 	//tnndl8.runShakingAndTwoopt();
 
-	//TourNearestNeighborDistanceLimit tnndlbig("set_64_1_50_300kicsi.txt"); // 
+
+
+	TourNearestNeighborDistanceLimit tnndlbig("smalltest_dl8test2opt.txt"); // 
 	
 	//tnndlbig.runShakingAndTwoopt();
-	//tnndlbig.runStringExchangesAndTwoopt();
+	/*
+	std::vector <int> probatour;
+	probatour.push_back(0);
+	probatour.push_back(2);
+	probatour.push_back(3);
+	probatour.push_back(4);
+	probatour.push_back(5);
+	probatour.push_back(1);
+
+	tnndlbig.doTwoOpt(probatour);
+	*/
+
 
 	
+	//tnndlbig.runStringExchangesAndTwoopt();
+
+	//TourFirstPickupSecondDelivery tfirstpickupseconddelivery("set_64_1_50_300.txt");
 	
-	TourPickupDeliveryPointPairs pickupdeliverypairs("set_64_1_50_300small.txt");
+	//TourPickupDeliveryPointPairs pickupdeliverypairs("set_64_1_50_300.txt");
 
 	//TourPickupDeliveryPointPairsParallel pickupdeliverypairsparallel("set_64_1_50_300small.txt");
 
 	//TourPickupDeliveryPointPairsParallelBest pickupdeliverypairsparallelbestofalltours("set_64_1_50_300small.txt");
 
-	//TourGreedyEinzelnePunkteSeriell tourgreedyeinzeln("set_64_1_50_300small.txt");
+
+
+	TourGreedyEinzelnePunkteSeriell tourgreedyeinzeln("set_64_1_50_300small.txt");
+
+	tourgreedyeinzeln.erasePoints(1, 0.1);
+
+
 
 
 

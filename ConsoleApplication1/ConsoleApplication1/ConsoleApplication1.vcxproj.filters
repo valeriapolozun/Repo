@@ -60,7 +60,7 @@
     <ClInclude Include="TourGreedyEinzelnePunkteSeriell.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ExportSolution.h">
+    <ClInclude Include="LoadCalculator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -104,7 +104,7 @@
     <ClCompile Include="TourGreedyEinzelnePunkteSeriell.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ExportSolution.cpp">
+    <ClCompile Include="LoadCalculator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

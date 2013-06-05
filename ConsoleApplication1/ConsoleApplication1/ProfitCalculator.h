@@ -14,10 +14,14 @@ class ProfitCalculator
 	double getProfit();
 	std:: vector <int> getZeroIntensityIndices();
 	void savesol(string fname);
+	
+	void loadCalculation( vector <int> & load, vector <int> & goodsOnTheLorry);
+	void bufferPlusCalculation(vector <int> goodsOnTheLorry, vector <int> & bufferPlus);
+	void bufferMinusCalculation(vector <int> goodsOnTheLorry, vector <int> & bufferMinus);
 
 	private:
 	void calculateProfit();
-	double intensityCalculation();
+	double intensityCalculation();	
 
 	std:: vector<int> tour;
 	double maxCapacity;

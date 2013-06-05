@@ -1,0 +1,58 @@
+
+void OrienteeringProblemWithPickupsAndDeliveries::doTwoOpt(std::vector <int>  & tour)
+{  
+	int n;
+	n= tour.size();
+	bool criterion=true;
+	while (criterion)
+	{
+		criterion=false;
+		for (int i = 1; i < n-2; i++) // 
+		{
+			if (criterion==true)
+			{ 
+				break;
+			}
+	
+			for (int j=i+1; j<n-1; j++) 
+			{
+				vector <int> newTourTmp(tour);
+				changeOrderPartOfTour(newTourTmp, i, j);
+				if (getTourLength(newTourTmp)<getTourLength(tour))
+				{
+					ProfitCalculator currentTour ( tour, inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity());
+					currentTour.loadCalculation(load, goodsOnTheLorry);
+					currentTour.bufferPlusCalculation(goodsOnTheLorry, bufferPlus);
+					currentTour.bufferMinusCalculation(goodsOnTheLorry, bufferMinus);
+					if ( load[i] <= load[j])
+					{
+						if ((bufferPlus[i]>= (load[j]-load[i])) && (bufferMinus[j]>= (load[j]-load[i])))
+						{
+							tour=newTourTmp;
+							criterion=true;
+							break;
+						}
+					}
+					else
+					{
+						if ((bufferMinus[i]>= (load[i]-load[j])) && (bufferPlus[j]>= (load[i]-load[j])))
+						{
+							tour=newTourTmp;
+							criterion=true;
+							break;
+						}
+					}
+				}
+
+			}
+			
+		}
+	}
+
+	cout << "The tour after 2-opt: "<< endl;
+		for(int j = 0; j < tour.size(); j++)
+		{
+			cout<<tour[j] << "   " ;
+		}
+		cout<<endl;
+}

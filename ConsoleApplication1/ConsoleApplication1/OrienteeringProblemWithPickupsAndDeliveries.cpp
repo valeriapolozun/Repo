@@ -9,11 +9,16 @@
 #include <stdio.h>
 #include <algorithm>
 #include <time.h>  
+#include <windows.h>
+#include <algorithm>  
 
 using namespace std;
 
+static clock_t clock_start;
+
 OrienteeringProblemWithPickupsAndDeliveries::OrienteeringProblemWithPickupsAndDeliveries(string inputFile)
 {
+	clock_start=clock();
 	inputDataProcessor.init(inputFile);
 	problemSize = inputDataProcessor.getProblemSize();
 	initProfitPerDistanceMatrix();
@@ -29,11 +34,10 @@ OrienteeringProblemWithPickupsAndDeliveries::OrienteeringProblemWithPickupsAndDe
 	{
 		wrongPairs[i].push_back(twotimeszero);
 	}
-	rexe="\"C:/Program Files/R/R-2.15.2/bin/R\"";
-	rpath="C:/Users/User/Documents/Visual Studio 2012/Projects/Repo/ConsoleApplication1/Rfiles/";
+	rexe="\"C:/Program Files/R/R-3.0.1/bin/R\"";
+	rpath="C:/Users/User/Documents/Rfiles/";
 	filename="empty";
-	
-
+	system ("del \"C:\\Users\\User\\Documents\\Rfiles\\tour*\""); 
 
 	
 }
@@ -42,6 +46,11 @@ OrienteeringProblemWithPickupsAndDeliveries::~OrienteeringProblemWithPickupsAndD
 {
 	
 }
+
+bool OrienteeringProblemWithPickupsAndDeliveries::isZero (int i) {
+  return (i==0);
+}
+
 
 
 void OrienteeringProblemWithPickupsAndDeliveries::initProfitPerDistanceMatrix()
@@ -103,17 +112,20 @@ void OrienteeringProblemWithPickupsAndDeliveries::getProfitMatrixForPickupAndDel
 			else
 			{
 			travelDistance = inputDataProcessor.getDistance(startNode, i)+inputDataProcessor.getDistance(i, j)+inputDataProcessor.getDistance(j, 1);
-			profitPerDistanceMatrix[i][j]= ((basicData[i].profit*basicData[min(i,j)].quantity)+(basicData[j].profit*basicData[min(i,j)].quantity))-travelDistance;
+			profitPerDistanceMatrix[i][j]= ((basicData[i].profit*basicData[min(i,j)].quantity)+(basicData[j].profit*basicData[min(i,j)].quantity))/travelDistance;
 			}
 		}
 	}
+	/*
 	if (!wrongPairs.empty())
 	{
 	for (int i = 0; i < wrongPairs[whichTour].size(); i++) // Nodes which were previously tried to be added to the tour
 	{
 		profitPerDistanceMatrix[wrongPairs[whichTour][i][0]] [wrongPairs[whichTour][i][1]]=-DBL_MAX;
 	}
+	
 	}
+	*/
 
 	/*
 	cout << "The profitPerDistance matrix is: "<< endl;
@@ -307,7 +319,7 @@ void OrienteeringProblemWithPickupsAndDeliveries::profitsOfAllTheTours()
 	{
 		ProfitCalculator initialToursProfit( solutionTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity()); 
 		cout << "Profit of the " << i+1 << ". tour: " << initialToursProfit.getProfit() << endl;
-		Rprintsol(rexe, rpath, filename, initialToursProfit);
+		Rprintsol(rexe, rpath, filename, initialToursProfit, i);
 		result= result+ initialToursProfit.getProfit();
 	}
 	cout << "The total profit of the tours all together :  " << result << endl;
@@ -394,11 +406,14 @@ void OrienteeringProblemWithPickupsAndDeliveries::doTwoOpt(std::vector <int>  & 
 		cout<<endl;
 }
 */
+
+
 void OrienteeringProblemWithPickupsAndDeliveries::doTwoOpt(std::vector <int>  & tour)
 {  
 	int n;
 	n= tour.size();
 	bool criterion=true;
+	double temp;
 	while (criterion)
 	{
 		criterion=false;
@@ -412,25 +427,51 @@ void OrienteeringProblemWithPickupsAndDeliveries::doTwoOpt(std::vector <int>  & 
 			for (int j=i+1; j<n-1; j++) 
 			{
 				vector <int> newTourTmp(tour);
+				
 				changeOrderPartOfTour(newTourTmp, i, j);
-				if (getTourLength(newTourTmp)<getTourLength(tour))
+				if ( (inputDataProcessor.getDistance(tour[i-1], tour[j])+inputDataProcessor.getDistance(tour[i], tour[j+1])) <  (inputDataProcessor.getDistance(tour[i-1], tour[i])+inputDataProcessor.getDistance(tour[j], tour[j+1])))
+				//if (getTourLength(newTourTmp)<getTourLength(tour))
 				{
+					ProfitCalculator currentTour ( tour, inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity());
+					currentTour.loadCalculation(load, goodsOnTheLorry);
+					double temp= load [i];
+					load[i]=load[j];
+					load[j]= temp;
+					vector <int> goodsOnLoad(goodsOnTheLorry);
+					int feasible=1;
+					goodsOnLoad[0]= 0;
+					for (int i=1; i < load.size(); i++)
+					{
+						goodsOnLoad[i]=goodsOnLoad[i-1]+load[i];
+					}
+					
+					for (int i=0; i < goodsOnLoad.size(); i++)
+					{
+						if ((goodsOnLoad[i]<0) || goodsOnLoad[i]>inputDataProcessor.getMaximumLoadCapacity())
+						{
+						feasible=0;
+						}	
+					}
+					
+					if (feasible=1)
+					{
 						tour=newTourTmp;
 						criterion=true;
 						break;
+					}
 				}
+
 			}
+			
 		}
 	}
 
-	/*
 	cout << "The tour after 2-opt: "<< endl;
 		for(int j = 0; j < tour.size(); j++)
 		{
 			cout<<tour[j] << "   " ;
 		}
 		cout<<endl;
-	*/
 }
 
 double OrienteeringProblemWithPickupsAndDeliveries::getTourLength(vector <int> tour)
@@ -505,6 +546,141 @@ void OrienteeringProblemWithPickupsAndDeliveries::runShaking()
 	shaking(solutionTours[0],3);
 }
 
+void OrienteeringProblemWithPickupsAndDeliveries::erasePoints(int neighborhoodSize, double percentageToErase)
+{
+	
+		cout << "The tours before erasing points  "<< endl;
+	for(int i = 0; i < solutionTours.size(); i++)
+	{
+		cout << " The tour nr. " << i+1 << "  " ;
+		for(int j = 0; j < solutionTours[i].size(); j++)
+		{
+			cout<< solutionTours[i][j] << "   " ;
+		}
+		cout<<endl;
+
+	}
+	
+		
+	int posToErase;
+	for (int i=0; i<solutionTours.size();i++)  // The local search with shaking will be done for each tour 
+	{	
+		//vector <int> tour = solutionTours[i];
+		for (int k=1 ; k< (max(floor(percentageToErase*solutionTours[i].size()/neighborhoodSize), 2)) ; k++)  // Neighborhood size is increasing
+		{
+		posToErase=rand()%(solutionTours[i].size()-neighborhoodSize-1)+1;
+
+
+		for (int m = 0; m < neighborhoodSize; m++)
+		{
+			unvisitedNodes[solutionTours[i][posToErase+m]]=1;
+		}
+
+		solutionTours[i].erase(solutionTours[i].begin()+posToErase, solutionTours[i].begin()+posToErase+neighborhoodSize);
+		}
+	}
+
+		cout << "The tours after erasing points  "<< endl;
+	for(int i = 0; i < solutionTours.size(); i++)
+	{
+		cout << " The tour nr. " << i+1 << "  " ;
+		for(int j = 0; j < solutionTours[i].size(); j++)
+		{
+			cout<< solutionTours[i][j] << "   " ;
+		}
+		cout<<endl;
+
+	}
+
+}
+
+
+
+void OrienteeringProblemWithPickupsAndDeliveries::insertPoints(vector <Coordinates> basicData, vector <int> tour)
+{
+	int best;
+	vector <int> unvisitedNodesForOneTour = unvisitedNodes;
+	bool insertionEnd=false;
+
+	while (insertionEnd!=true)
+	{
+
+		for (int i=0; i< unvisitedNodesForOneTour.size(); i++)
+		{
+			if (unvisitedNodesForOneTour[i]=1)
+			{
+				if (basicData[i].quantity >0) // if it is a pick up point
+				{
+					if (basicData[i].profit >best)   // The cheaper it costs, the better it is
+					{
+					best= i;
+					}
+				}
+			}
+
+			// 2. Choosing the best place to insert in the other tour
+			double minTourLength=DBL_MAX;
+			double TourLengthExtension;
+			int posToInsert;
+			vector <int> possiblePositionsToInsert;
+			possiblePositionsToInsert.assign( tour.size(), 1);
+			bool criterion=false;
+			bool noLoadCapacityToInsert=false;
+			while (criterion!=true)
+			{
+				for (int i = 0; i < possiblePositionsToInsert.size()-1; i++)
+				{
+					if (possiblePositionsToInsert[i]=1)
+					{
+						TourLengthExtension= inputDataProcessor.getDistance (tour[i], best)+ inputDataProcessor.getDistance (best, tour[i+1]);
+						if (TourLengthExtension < minTourLength)
+						{
+							minTourLength=TourLengthExtension;
+							posToInsert= i+1;
+						}
+					}
+				}
+					
+				if ( basicData[best].quantity>0 && basicData[best].quantity > bufferPlus[posToInsert]) // || ( basicData[best].quantity<0 && basicData[best].quantity < bufferMinus[posToInsert]))
+				{
+					tour.insert(tour.begin()+posToInsert, best);
+					unvisitedNodes[best]=0;
+					criterion=true;
+					insertionEnd=true;
+				}
+				else
+				{
+					possiblePositionsToInsert[posToInsert-1]=0;
+				}
+				unvisitedNodesForOneTour[best]=0;
+			
+				std::vector<int>::iterator it = std::find_if (possiblePositionsToInsert.begin(), possiblePositionsToInsert.end(), &OrienteeringProblemWithPickupsAndDeliveries::isZero);		
+				if (it==possiblePositionsToInsert.end())
+				{
+					criterion=true;
+					noLoadCapacityToInsert=true;
+					
+				}
+			
+			}
+		}
+	}
+	cout << "The tours after inserting points  "<< endl;
+	for(int i = 0; i < solutionTours.size(); i++)
+	{
+		cout << " The tour nr. " << i+1 << "  " ;
+		for(int j = 0; j < solutionTours[i].size(); j++)
+		{
+			cout<< solutionTours[i][j] << "   " ;
+		}
+		cout<<endl;
+	}
+}
+
+
+
+
+
 void OrienteeringProblemWithPickupsAndDeliveries::runShakingAndTwoopt()
 {
 	vector < vector <int>> bestTours;
@@ -523,6 +699,7 @@ void OrienteeringProblemWithPickupsAndDeliveries::runShakingAndTwoopt()
 			{
 				shaking(tour,k);
 				makeTourFeasible (tour);
+				ProfitCalculator currentTour ( bestTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity());
 				doTwoOpt(tour);
 				ProfitCalculator newTour( tour, inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity());
 
@@ -690,36 +867,22 @@ void  OrienteeringProblemWithPickupsAndDeliveries::stringExchanges (vector < vec
 }
 
 
-void  OrienteeringProblemWithPickupsAndDeliveries::Rprintsol(string rexe, string rpath, string filename, ProfitCalculator solution){
+void  OrienteeringProblemWithPickupsAndDeliveries::Rprintsol(string rexe, string rpath, string filename, ProfitCalculator solution, int i){
 	
 	solution.savesol( rpath + "example1.txt");
 	inputDataProcessor.Rsavesinstance(rpath + "example2.txt");		
+	string syscommand("\"C:\\Program Files\\R\\R-3.0.1\\bin\\R\" -f C:\\Users\\User\\Documents\\Rfiles\\start.r");
+	//replace(syscommand.begin(),syscommand.end(),'/','\\');
+	system(syscommand.c_str());
 
-	int lastchar = filename.find_first_of(".")-1;
-	string filetrunc = string(filename.substr(0,lastchar));
-	//string fnamesolcplex =  filetrunc + "_" + extension + ".pdf";
-
-	string syscommand(rexe);
-	syscommand = syscommand + " -f " + rpath + "start.r";
-	replace(syscommand.begin(),syscommand.end(),'/','\\');
-	system(syscommand.c_str());
-	syscommand = std::string("echo ") + syscommand;
-	system(syscommand.c_str());
-	// system("\"C:/Program Files/R/R-2.15.0/bin/R\" -f C:/Users/martin/Desktop/projects/pickupanddeliveryteamorienteering/R/start.r");
-		
-	syscommand = string("del ");
-	//syscommand = syscommand + rpath + fnamesolcplex;
-	replace(syscommand.begin(),syscommand.end(),'/','\\');
-	system(syscommand.c_str());
-	syscommand = std::string("echo ") + syscommand;
-	system(syscommand.c_str());
+	string rename ("rename \"C:\\Users\\User\\Documents\\Rfiles\\test123.pdf\" \"tour" + std::to_string(i+1) + ".pdf\"");
+	system( rename.c_str());
 	
-	syscommand = string("ren ");
-	//syscommand = syscommand + rpath + "test123.pdf " + fnamesolcplex;
-	replace(syscommand.begin(),syscommand.end(),'/','\\');
-	system(syscommand.c_str()); 
-	syscommand = std::string("echo ") + syscommand;
-	system(syscommand.c_str());
+	
+double time_c=(double)(clock()- clock_start)/CLOCKS_PER_SEC;
+cout << time_c;
 
 }
+
+
 

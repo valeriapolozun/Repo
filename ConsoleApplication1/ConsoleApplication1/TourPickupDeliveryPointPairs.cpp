@@ -126,19 +126,12 @@ void TourPickupDeliveryPointPairs::calcTourChoosePickupAndDeliveryPointPairs2(in
 		unvisitedNodesForOneTour[1]=0;
 		unvisitedNodesForOneTour[startNode]=0;
 	*/
+	getProfitMatrixForPickupAndDeliveryPairs (startNode, whichTour);
 
 	for (int i = 0; i < (problemSize-2); i++)  /// TO DO : Calculate how many times it should run (problemSize-2) is wrong
 	{
 		getPickUpDeliveryPointPairsTwoPointsAdded(unvisitedNodesForOneTour, tour.back(), bestPairs, whichTour);
 
-	/*
-		startNode=getPickUpDeliveryPointPairsOnePointAdded(unvisitedNodesForOneTour, tour.back());
-		if (startNode==0){
-			continue;
-		}
-		else
-		{
-	*/
 		if (!bestPairs[0]==0)
 		{
 			if (isTotalLengthUnderLimit2Nodes(tour, bestPairs))
@@ -152,10 +145,12 @@ void TourPickupDeliveryPointPairs::calcTourChoosePickupAndDeliveryPointPairs2(in
 			}
 			else
 			{
-			wrongPairsForOneTour.push_back(bestPairs);
-			}
+			//wrongPairsForOneTour.push_back(bestPairs);
+			wrongPairs[whichTour].push_back(bestPairs);
+		    profitPerDistanceMatrix[bestPairs[0]] [bestPairs[1]]=-DBL_MAX;
 			bestPairs[0]=0;
 			bestPairs[1]=0;
+			}
 		}
 	}
 	
@@ -219,7 +214,7 @@ void TourPickupDeliveryPointPairs::getPickUpDeliveryPointPairsTwoPointsAdded (ve
 			if(unvisitedCities[j]==0) continue; 
 			if (startNode == i) continue; 
 			if (startNode == j) continue; 
-			getProfitMatrixForPickupAndDeliveryPairs (startNode, whichTour);
+			//getProfitMatrixForPickupAndDeliveryPairs (startNode, whichTour);
 			//cout << "the i: " << i << "the profitperdistancematrix[startnode][i]" << profitPerDistanceMatrix[startNode][i] << " a max value: " << max << endl;
 			if(profitPerDistanceMatrix[i][j]>max)
 			{			
