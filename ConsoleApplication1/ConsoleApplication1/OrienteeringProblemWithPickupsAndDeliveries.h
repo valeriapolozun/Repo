@@ -33,11 +33,12 @@ public:
 	
 	void Rprintsol(string rexe, string rpath, string filename, ProfitCalculator solution, int i);
 
-	void doTwoOpt(std::vector <int>  & tour);
+	void doTwoOpt(int whichTour);
 	void erasePoints(int neighborhoodSize, double percentageToErase);
-	void insertPoints(vector<Coordinates> basicData, vector <int> tour);
+	void insertPoints(vector<Coordinates> basicData, int whichTour);
 	bool isZero (int i);
-
+	void doInsertion();
+	double maxCapacity;
 
 
 
@@ -51,6 +52,7 @@ protected:
 	std::vector<int> unvisitedNodes;
 	bool isTotalLengthUnderLimit(std::vector<int> currentTour, int nodeToAdd);
 	bool isTotalLengthUnderLimit2Nodes(std::vector<int> currentTour, std::vector <int> nodesToAdd);
+	bool isTotalLengthUnderLimit (vector<int> currentTour, int nodeToAdd, int position);
 	std::vector < std::vector <double> > profitPerDistanceMatrix;
 	void getProfitMatrixForPickupAndDeliveryPairs(int startNode, int whichTour);
 	int numberOfTours;
@@ -59,12 +61,11 @@ protected:
 	double getTourLength(std::vector <int> tour);
 	void getProfitMatrixForPickupAndDeliveryPairsParallel(int whichTour);
 	void getProfitMatrixForPickupAndDeliveryPairsParallelBest();
-	vector <int> load;
-	vector <int> goodsOnTheLorry;
+	std::vector <std::vector <int> > load;
+	std::vector <std::vector <int> > goodsOnTheLorry;
 	
-	vector <int> bufferPlus;
-	vector <int> bufferMinus;
-
+	std::vector <std::vector <int> > bufferPlus;
+	std::vector <std::vector <int> >  bufferMinus;
 
 private:
 	

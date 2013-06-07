@@ -1,26 +1,35 @@
-/*
+
 #ifndef __LOADCALCULATOR__
 #define __LOADCALCULATOR__
 
 
 #include "Coordinates.h"
 #include <vector>
+#include <string>
+
+using namespace std;
 
 
 class LoadCalculator
 {
 	public:
-	void loadCalculation (std::vector <int> tour, std::vector<double> intensity, std::vector <double> maxQuantities, std::vector <Coordinates> basicDataInput)
+	LoadCalculator (std::vector <int> & load, std::vector <int> & goodsOnTheLorry, std::vector <int> & bufferPlus, std:: vector <int> & bufferMinus);
+	void loadCalculation (vector <int> & load, vector <int> & goodsOnTheLorry);
 	vector <int> load;
+	void bufferPlusCalculation(vector <int> goodsOnTheLorry, vector <int> & bufferPlus);
+	void bufferMinusCalculation ( vector <int> goodsOnTheLorry, vector <int> & bufferMinus);
+
+
+
 
 	private:
 	std:: vector<Coordinates> basicData;
 	vector <int> tour;
 	vector <double> intensity;
 	vector <double> maxQuantities;
+	double maxCapacity;
 
-}
+};
 
 #endif
 
-*/

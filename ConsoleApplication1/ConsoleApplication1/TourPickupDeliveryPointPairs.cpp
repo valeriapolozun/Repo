@@ -212,8 +212,8 @@ void TourPickupDeliveryPointPairs::getPickUpDeliveryPointPairsTwoPointsAdded (ve
 		for(int j=0; j<unvisitedCities.size(); j++)
 		{
 			if(unvisitedCities[j]==0) continue; 
-			if (startNode == i) continue; 
-			if (startNode == j) continue; 
+			//if (startNode == i) continue; 
+			//if (startNode == j) continue; 
 			//getProfitMatrixForPickupAndDeliveryPairs (startNode, whichTour);
 			//cout << "the i: " << i << "the profitperdistancematrix[startnode][i]" << profitPerDistanceMatrix[startNode][i] << " a max value: " << max << endl;
 			if(profitPerDistanceMatrix[i][j]>max)
@@ -225,7 +225,7 @@ void TourPickupDeliveryPointPairs::getPickUpDeliveryPointPairsTwoPointsAdded (ve
 		 }
     }
 
-	//cout << "The next nearest point is: " << nearest << endl;
+	cout << "The best pair is: " << bestPairs[0] << " and " << bestPairs[1] << endl;
    return;
 }
 

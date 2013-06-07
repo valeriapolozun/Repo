@@ -22,6 +22,8 @@ ProfitCalculator:: ProfitCalculator(std::vector <int> tourInput,std::vector <Coo
 	result=0;
 	calculateProfit();
 
+
+
 }
 
 void ProfitCalculator:: calculateProfit()
