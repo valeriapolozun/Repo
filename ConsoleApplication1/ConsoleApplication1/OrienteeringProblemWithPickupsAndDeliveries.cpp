@@ -345,10 +345,22 @@ bool OrienteeringProblemWithPickupsAndDeliveries::isThereUnvisitedNodes()
 
 void OrienteeringProblemWithPickupsAndDeliveries::profitsOfAllTheTours()
 {
+
 	double result=0;
 	for (int i=0 ; i< solutionTours.size();i++)
 	{
 		ProfitCalculator initialToursProfit( solutionTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity()); 
+		vector <double> intensityToInsert=  initialToursProfit.getIntensity();
+		intensity[i].insert(intensity[i].begin(), intensityToInsert.begin(),intensityToInsert.end());
+		/*
+		//intensity[i].assign(intensityToInsert.size(), 0);
+		for(int j = 0; j < intensityToInsert.size(); j++) 
+		{ 
+			//intensity[i].assign(intensityToInsert.size(), 0);
+			//intensity[i].reserve(intensityToInsert.size());
+			intensity[i][j] = intensityToInsert[j];
+		}
+		*/
 		cout << "Profit of the " << i+1 << ". tour: " << initialToursProfit.getProfit() << endl;
 		Rprintsol(rexe, rpath, filename, initialToursProfit, i);
 		result= result+ initialToursProfit.getProfit();
@@ -466,7 +478,7 @@ void OrienteeringProblemWithPickupsAndDeliveries::doTwoOpt(int whichTour)
 				//if (getTourLength(newTourTmp)<getTourLength(tour))
 				{
 					ProfitCalculator currentTour ( solutionTours[whichTour], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity());
-					LoadCalculator loadCalculation(load[whichTour], goodsOnTheLorry[whichTour], bufferPlus[whichTour], bufferMinus[whichTour]);
+					LoadCalculator loadCalculation(load[whichTour], goodsOnTheLorry[whichTour], bufferPlus[whichTour], bufferMinus[whichTour], intensity[whichTour]);
 					double temp= load[whichTour][i];
 					load[whichTour][i]=load[whichTour][j];
 					load[whichTour][j]= temp;
@@ -610,6 +622,12 @@ void OrienteeringProblemWithPickupsAndDeliveries::erasePoints(int neighborhoodSi
 		}
 
 		solutionTours[i].erase(solutionTours[i].begin()+posToErase, solutionTours[i].begin()+posToErase+neighborhoodSize);
+		load[i].erase(load[i].begin()+posToErase, load[i].begin()+posToErase+neighborhoodSize);
+		bufferPlus[i].erase(bufferPlus[i].begin()+posToErase, bufferPlus[i].begin()+posToErase+neighborhoodSize);
+		bufferMinus[i].erase(bufferMinus[i].begin()+posToErase, bufferMinus[i].begin()+posToErase+neighborhoodSize);
+		
+		
+		
 		}
 	}
 
@@ -663,7 +681,7 @@ void OrienteeringProblemWithPickupsAndDeliveries::insertPoints(vector <Coordinat
 			bool noLoadCapacityToInsert=false;
 			for (int i = 0; i < tour.size()-1; i++)
 			{
-				if (isTotalLengthUnderLimit( tour, best, i+1) && (basicData[best].quantity/2) < bufferPlus[whichTour][i+1] )
+				if (isTotalLengthUnderLimit( tour, best, i+1) && (basicData[best].quantity) < bufferPlus[whichTour][i+1] )
 				{
 					TourLengthExtension= inputDataProcessor.getDistance (tour[i], best)+ inputDataProcessor.getDistance (best, tour[i+1]);
 					if (TourLengthExtension < minTourLengthExtension) 
@@ -675,7 +693,9 @@ void OrienteeringProblemWithPickupsAndDeliveries::insertPoints(vector <Coordinat
 			}
 			if (minTourLengthExtension!=DBL_MAX)
 			{
-			tour.insert(tour.begin()+posToInsert, best);
+			solutionTours[whichTour].insert(tour.begin()+posToInsert, best);
+			intensity[whichTour].insert(intensity[whichTour].begin()+posToInsert, 1);
+			LoadCalculator newLoad( load[whichTour], goodsOnTheLorry[whichTour], bufferPlus[whichTour], bufferMinus[whichTour], intensity[whichTour]);
 			unvisitedNodes[best]=0;
 			insertionEnd=true;
 			}
@@ -854,7 +874,7 @@ void  OrienteeringProblemWithPickupsAndDeliveries::stringExchanges (vector < vec
 	//{
 		if ((tours[tourNumber].size()-2)>numberOfNodesToErase)
 		{
-			//ProfitCalculator tourInwhichNodesWillBeAddedProfit ( solutionTours[tourNumber+1], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity());
+			
 			// 1. Erase
 			posToErase=rand()%(tours[tourNumber].size()-numberOfNodesToErase-1)+1;
 			for (int i = 0; i < numberOfNodesToErase; i++)

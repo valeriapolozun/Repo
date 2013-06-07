@@ -66,6 +66,7 @@ protected:
 	
 	std::vector <std::vector <int> > bufferPlus;
 	std::vector <std::vector <int> >  bufferMinus;
+	std::vector <std::vector <double> >  intensity;
 
 private:
 	

@@ -220,11 +220,6 @@ void ProfitCalculator::bufferMinusCalculation ( vector <int> goodsOnTheLorry, ve
 
 
 
-
-
-
-
-
 void ProfitCalculator::savesol(string fname)
 {
 		ofstream myfile;
@@ -256,6 +251,11 @@ void ProfitCalculator::savesol(string fname)
 		myfile << intensity[tour.size()-1]*basicData[tour.size()-1].quantity << ")" << endl;
 		myfile.close();
 	};
+
+vector <double> ProfitCalculator::getIntensity()
+{
+	return intensity;
+};
 
 
 

@@ -18,6 +18,7 @@ class ProfitCalculator
 	void loadCalculation( vector <int> & load, vector <int> & goodsOnTheLorry);
 	void bufferPlusCalculation(vector <int> goodsOnTheLorry, vector <int> & bufferPlus);
 	void bufferMinusCalculation(vector <int> goodsOnTheLorry, vector <int> & bufferMinus);
+	vector <double> getIntensity();
 
 	private:
 	void calculateProfit();

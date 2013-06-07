@@ -5,18 +5,18 @@
 
 using namespace std;
 
-LoadCalculator:: LoadCalculator (vector <int> & load, vector <int> & goodsOnTheLorry, vector <int> & bufferPlus, vector <int> & bufferMinus)
+LoadCalculator:: LoadCalculator (vector <int> & load, vector <int> & goodsOnTheLorry, vector <int> & bufferPlus, vector <int> & bufferMinus, vector<double> intensity)
 {
 	//maxCapacity = & OrienteeringProblemWithPickupsAndDeliveries::maxCapacity;
 	maxCapacity= 300;
-	loadCalculation (load, goodsOnTheLorry);
+	loadCalculation (load, goodsOnTheLorry, intensity);
 	bufferPlusCalculation( goodsOnTheLorry, bufferPlus);
 	bufferMinusCalculation (  goodsOnTheLorry, bufferMinus);
 }
 
 
 
-void LoadCalculator::loadCalculation(vector <int> & load, vector <int> & goodsOnTheLorry)
+void LoadCalculator::loadCalculation(vector <int> & load, vector <int> & goodsOnTheLorry, vector <double> intensity)
 {
 	load.push_back(0);
 	goodsOnTheLorry.push_back(0);
