@@ -53,6 +53,7 @@ protected:
 	bool isTotalLengthUnderLimit(std::vector<int> currentTour, int nodeToAdd);
 	bool isTotalLengthUnderLimit2Nodes(std::vector<int> currentTour, std::vector <int> nodesToAdd);
 	bool isTotalLengthUnderLimit (vector<int> currentTour, int nodeToAdd, int position);
+	bool isTotalLengthUnderLimit2NodesDifferentPlace (vector<int> currentTour, int nodeToAdd, int position, int node2ToAdd, int position2);
 	std::vector < std::vector <double> > profitPerDistanceMatrix;
 	void getProfitMatrixForPickupAndDeliveryPairs(int startNode, int whichTour);
 	int numberOfTours;
@@ -67,11 +68,14 @@ protected:
 	std::vector <std::vector <int> > bufferPlus;
 	std::vector <std::vector <int> >  bufferMinus;
 	std::vector <std::vector <double> >  intensity;
+	vector <int> quantities;
+	void calcPickupDeliveryPointPairs();
+
 
 private:
 	
 	void initProfitPerDistanceMatrix();
-	void calcPickupDeliveryPointPairs();
+	void initIntensityMatrix();
 	int getHighestDemandInNeighborhood(std::vector<int> unvisitedCities, int startNode);
 	
 	void changeOrderPartOfTour( std::vector <int> & tour, int from, int to);

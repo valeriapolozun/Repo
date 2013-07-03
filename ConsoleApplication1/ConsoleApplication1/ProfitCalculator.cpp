@@ -1,12 +1,13 @@
 #include "ProfitCalculator.h"
 #include "InputDataProcessor.h"
+#include "OrienteeringProblemWithPickupsAndDeliveries.h"
 #include <glpk.h>
 #include <iostream>
 #include <fstream>
 
 using namespace std;
 
-ProfitCalculator:: ProfitCalculator(std::vector <int> tourInput,std::vector <Coordinates> basicDataInput, double maxCapacityInput) 
+ProfitCalculator:: ProfitCalculator(std::vector <int> tourInput,std::vector <Coordinates> basicDataInput, double maxCapacityInput, double tourLength) 
 {
 	upperbound = - 1;
 	CPUtime = 0;
@@ -22,7 +23,7 @@ ProfitCalculator:: ProfitCalculator(std::vector <int> tourInput,std::vector <Coo
 	result=0;
 	calculateProfit();
 
-
+	result=result-tourLength ;
 
 }
 
@@ -50,7 +51,6 @@ void ProfitCalculator:: calculateProfit()
 			result += basicData[i].quantity*basicData[i].profit*intensity[i];
 		}
 	}
-
 
 }
 

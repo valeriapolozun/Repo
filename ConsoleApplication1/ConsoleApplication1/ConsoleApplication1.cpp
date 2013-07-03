@@ -52,15 +52,17 @@ int main(int argc, char **argv) {
 
 	//TourFirstPickupSecondDelivery tfirstpickupseconddelivery("set_64_1_50_300.txt");
 	
-	//TourPickupDeliveryPointPairs pickupdeliverypairs("set_64_1_50_300small.txt");
+	//TourPickupDeliveryPointPairs pickupdeliverypairs("set_64_1_50_300.txt");
 
-	//TourPickupDeliveryPointPairsParallel pickupdeliverypairsparallel("set_64_1_50_300small.txt");
+	//TourPickupDeliveryPointPairsParallel pickupdeliverypairsparallel("set_64_1_50_300.txt");
 
 	//TourPickupDeliveryPointPairsParallelBest pickupdeliverypairsparallelbestofalltours("set_64_1_50_300small.txt");
 
 
 	
-	TourGreedyEinzelnePunkteSeriell tourgreedyeinzeln("set_64_1_50_300small.txt");
+	TourGreedyEinzelnePunkteSeriell tourgreedyeinzeln("set_64_1_50_300.txt");
+
+	/*
 
 	tourgreedyeinzeln.erasePoints(1, 0.1);
 	tourgreedyeinzeln.erasePoints(1, 0.1);
@@ -68,6 +70,8 @@ int main(int argc, char **argv) {
 
 
 	tourgreedyeinzeln.doInsertion();
+	*/
+
 
 	
 

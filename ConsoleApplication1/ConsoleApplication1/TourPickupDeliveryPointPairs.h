@@ -20,6 +20,7 @@ class TourPickupDeliveryPointPairs: public OrienteeringProblemWithPickupsAndDeli
 	void getPickUpDeliveryPointPairsTwoPointsAdded (std::vector<int> unvisitedCities, int startNode, std::vector <int> & bestPair, int whichTour);
 	std::vector <int> bestPairs;
 	void calcTourChoosePickupAndDeliveryPointPairs2(int whichTour);
+	void getPickUpDeliveryPointPairsTwoPointsAddedRandomised (vector<int> unvisitedCities, int startNode, vector <int> & bestPairs, int whichTour);
 	
 
 };

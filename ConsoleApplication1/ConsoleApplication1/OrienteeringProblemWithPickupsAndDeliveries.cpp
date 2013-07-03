@@ -30,6 +30,10 @@ OrienteeringProblemWithPickupsAndDeliveries::OrienteeringProblemWithPickupsAndDe
 	unvisitedNodes[1]=0;
 	numberOfTours=3;
 	wrongPairs.resize(numberOfTours);
+	load.resize(numberOfTours);
+	bufferPlus.resize(numberOfTours);
+	bufferMinus.resize(numberOfTours);
+	goodsOnTheLorry.resize(numberOfTours);
 	vector <int> twotimeszero;
 	twotimeszero.assign(2,0);
 	for (int i = 0; i < numberOfTours; i++)
@@ -61,6 +65,14 @@ void OrienteeringProblemWithPickupsAndDeliveries::initProfitPerDistanceMatrix()
 	profitPerDistanceMatrix.assign(problemSize, initToZeroVector);
 }
 
+void OrienteeringProblemWithPickupsAndDeliveries::initIntensityMatrix()
+{
+	vector <double> initToZeroVector(solutionTours[0].size(),0);
+	intensity.assign(solutionTours.size(), initToZeroVector);
+}
+
+
+
 void OrienteeringProblemWithPickupsAndDeliveries::calcPickupDeliveryPointPairs()
 	{
 	double travelDistance; // stores the calculated distances
@@ -68,16 +80,40 @@ void OrienteeringProblemWithPickupsAndDeliveries::calcPickupDeliveryPointPairs()
 	vector<Coordinates> basicData(inputDataProcessor.getBasicData());
 	for (int i = 0; i < problemSize; i++)
 	{
-		for(int j = 0; j < problemSize; j++)
+		for(int j = i+1; j < problemSize; j++)
 		{
-			travelDistance = inputDataProcessor.getDistance(i, j);
+			if(basicData[i].quantity*basicData[j].quantity >= 0 || basicData[i].quantity<=0 )   
+			{
+				profitPerDistanceMatrix[i][j]=-DBL_MAX;
+			}
+			else
+			{
+				travelDistance = inputDataProcessor.getDistance(i, j);
+				if ( basicData[i].quantity>0)
+				{
+					profitPerDistanceMatrix[i][j]= (basicData[i].profit-basicData[j].profit)*min(basicData[i].quantity,-(basicData[j].quantity))/travelDistance;
+				}
+				else
+				{
+					profitPerDistanceMatrix[i][j]=-DBL_MAX;
+					//profitPerDistanceMatrix[i][j]= (-basicData[i].profit+basicData[j].profit)*min(-( basicData[i].quantity),basicData[j].quantity)/travelDistance;
+				}
+
+			}
+		}
+	}
+
+
+			/*
+			//travelDistance = inputDataProcessor.getDistance(i, j);
 			if(basicData[i].quantity*basicData[j].quantity >= 0 && basicData[i].quantity<=0)   
 			{
 				profitPerDistanceMatrix[i][j]=-DBL_MAX;
 			}
 			else
 			{
-			profitPerDistanceMatrix[i][j]= ((basicData[i].profit*basicData[min(i,j)].quantity)+(basicData[j].profit*basicData[min(i,j)].quantity))-travelDistance;
+			//profitPerDistanceMatrix[i][j]= ((basicData[i].profit*basicData[min(i,j)].quantity)+(basicData[j].profit*basicData[min(i,j)].quantity))-travelDistance;
+			profitPerDistanceMatrix[i][j]= ((basicData[i].profit*basicData[min(i,j)].quantity)+(basicData[j].profit*basicData[min(i,j)].quantity));
 			}
 		}
 	}
@@ -88,12 +124,13 @@ void OrienteeringProblemWithPickupsAndDeliveries::calcPickupDeliveryPointPairs()
 	{
 		for(int j = 0; j < problemSize; j++)
 		{
-			cout<<profitPerDistanceMatrix[i][j] << "   " ;
+			cout<<[i][j] << "   " ;
 		}
 		cout<<endl;
 	}
-	*/
+*/	
 }
+
 
 
 void OrienteeringProblemWithPickupsAndDeliveries::getProfitMatrixForPickupAndDeliveryPairs(int startNode, int whichTour)
@@ -120,7 +157,8 @@ void OrienteeringProblemWithPickupsAndDeliveries::getProfitMatrixForPickupAndDel
 			}
 			else
 			{
-			profitPerDistanceMatrix[i][j]= (-basicData[i].profit+basicData[j].profit)*min(-( basicData[i].quantity),basicData[j].quantity)/travelDistance;
+			profitPerDistanceMatrix[i][j]=-DBL_MAX;
+			//profitPerDistanceMatrix[i][j]= (-basicData[i].profit+basicData[j].profit)*min(-( basicData[i].quantity),basicData[j].quantity)/travelDistance;
 			}
 
 
@@ -159,11 +197,11 @@ void OrienteeringProblemWithPickupsAndDeliveries::getProfitMatrixForPickupAndDel
 	double travelDistance; // stores the calculated distances
 	double profitValueMax; // profit value per unit which can be reached by visiting a certain pair of Pick up and Delivery point
 	vector<Coordinates> basicData(inputDataProcessor.getBasicData());
-	
+	double travelCostFactor;
 
 	for (int i = 0; i < problemSize; i++)
 	{
-		for(int j = 0; j < problemSize; j++)
+		for(int j = i+1; j < problemSize; j++)
 		{
 			if(basicData[i].quantity*basicData[j].quantity >= 0 || basicData[i].quantity<=0 || unvisitedNodes[i]==0)   
 			{
@@ -171,11 +209,12 @@ void OrienteeringProblemWithPickupsAndDeliveries::getProfitMatrixForPickupAndDel
 			}
 			else
 			{
-			profitPerDistanceMatrix[i][j]= ((basicData[i].profit*basicData[min(i,j)].quantity)+(basicData[j].profit*basicData[min(i,j)].quantity));
+			travelCostFactor=inputDataProcessor.getDistance(0,i)+inputDataProcessor.getDistance(0,j)+inputDataProcessor.getDistance(i,1)+inputDataProcessor.getDistance(j,1);
+			profitPerDistanceMatrix[i][j]= (basicData[i].profit-basicData[j].profit)*min(basicData[i].quantity,-(basicData[j].quantity)/travelCostFactor);
 			}
 		}
 	}
-
+	/*
 	for (int i = 0; i < wrongPairs[whichTour].size(); i++) // Nodes which were previously tried to be added to the tour
 	{
 		if ( wrongPairs[whichTour][i][0]!=0 && wrongPairs[whichTour][i][1]!=0)
@@ -183,7 +222,7 @@ void OrienteeringProblemWithPickupsAndDeliveries::getProfitMatrixForPickupAndDel
 			profitPerDistanceMatrix[wrongPairs[whichTour][i][0]] [wrongPairs[whichTour][i][1]]=-DBL_MAX;
 		}
 	}
-
+	*/
 	/*
 	cout << "The profitPerDistance matrix is: "<< endl;
 	for (int i = 0; i < problemSize; i++)
@@ -311,10 +350,31 @@ bool OrienteeringProblemWithPickupsAndDeliveries::isTotalLengthUnderLimit (vecto
 		result += inputDataProcessor.getDistance(lastNode, currentNode);
 		lastNode = currentNode;
 	}
-	result= result+ inputDataProcessor.getDistance(lastNode, 1);
+	//result= result+ inputDataProcessor.getDistance(lastNode, 1);
 	return result<=inputDataProcessor.getMaximumTourLength(); // Is my tour length smaller than dMax. TRUE or FALSE will return
 
 }
+
+bool OrienteeringProblemWithPickupsAndDeliveries::isTotalLengthUnderLimit2NodesDifferentPlace (vector<int> currentTour, int nodeToAdd, int position, int node2ToAdd, int position2){
+	double result = 0;
+	int lastNode = currentTour[0];
+	currentTour.insert(currentTour.begin()+position, nodeToAdd);
+	currentTour.insert(currentTour.begin()+position2, node2ToAdd);
+
+	for(int i = 1; i < currentTour.size(); i++) { // The total length of the tour will be computed
+		int currentNode = currentTour[i];
+		result += inputDataProcessor.getDistance(lastNode, currentNode);
+		lastNode = currentNode;
+	}
+	//result= result+ inputDataProcessor.getDistance(lastNode, 1);
+	return result<=inputDataProcessor.getMaximumTourLength(); // Is my tour length smaller than dMax. TRUE or FALSE will return
+
+}
+
+
+
+
+
 
 
 
@@ -349,23 +409,31 @@ void OrienteeringProblemWithPickupsAndDeliveries::profitsOfAllTheTours()
 	double result=0;
 	for (int i=0 ; i< solutionTours.size();i++)
 	{
-		ProfitCalculator initialToursProfit( solutionTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity()); 
+		ProfitCalculator initialToursProfit( solutionTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity(), getTourLength(solutionTours[i])); 
 		vector <double> intensityToInsert=  initialToursProfit.getIntensity();
-		intensity[i].insert(intensity[i].begin(), intensityToInsert.begin(),intensityToInsert.end());
-		/*
-		//intensity[i].assign(intensityToInsert.size(), 0);
-		for(int j = 0; j < intensityToInsert.size(); j++) 
-		{ 
-			//intensity[i].assign(intensityToInsert.size(), 0);
-			//intensity[i].reserve(intensityToInsert.size());
-			intensity[i][j] = intensityToInsert[j];
-		}
-		*/
+		intensity.push_back(intensityToInsert);
+		
 		cout << "Profit of the " << i+1 << ". tour: " << initialToursProfit.getProfit() << endl;
 		Rprintsol(rexe, rpath, filename, initialToursProfit, i);
 		result= result+ initialToursProfit.getProfit();
 	}
 	cout << "The total profit of the tours all together :  " << result << endl;
+	cout << "The tours:    "<< endl;
+	for(int i = 0; i < solutionTours.size(); i++)
+	{
+		cout << " The tour nr. " << i+1 << "  " ;
+		for(int j = 0; j < solutionTours[i].size(); j++)
+		{
+			cout<< solutionTours[i][j] << "   " ;
+		}
+		cout<<endl;
+
+	}
+
+
+
+
+
 }
 
 void OrienteeringProblemWithPickupsAndDeliveries::runTwoOpt()
@@ -477,8 +545,8 @@ void OrienteeringProblemWithPickupsAndDeliveries::doTwoOpt(int whichTour)
 				if ( (inputDataProcessor.getDistance(solutionTours[whichTour][i-1], solutionTours[whichTour][j])+inputDataProcessor.getDistance(solutionTours[whichTour][i], solutionTours[whichTour][j+1])) <  (inputDataProcessor.getDistance(solutionTours[whichTour][i-1], solutionTours[whichTour][i])+inputDataProcessor.getDistance(solutionTours[whichTour][j], solutionTours[whichTour][j+1])))
 				//if (getTourLength(newTourTmp)<getTourLength(tour))
 				{
-					ProfitCalculator currentTour ( solutionTours[whichTour], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity());
-					LoadCalculator loadCalculation(load[whichTour], goodsOnTheLorry[whichTour], bufferPlus[whichTour], bufferMinus[whichTour], intensity[whichTour]);
+					ProfitCalculator currentTour ( solutionTours[whichTour], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity(), getTourLength(solutionTours[whichTour]));
+					LoadCalculator loadCalculation(load[whichTour], goodsOnTheLorry[whichTour], bufferPlus[whichTour], bufferMinus[whichTour], intensity[whichTour], inputDataProcessor.getQuantities());
 					double temp= load[whichTour][i];
 					load[whichTour][i]=load[whichTour][j];
 					load[whichTour][j]= temp;
@@ -593,7 +661,6 @@ void OrienteeringProblemWithPickupsAndDeliveries::runShaking()
 
 void OrienteeringProblemWithPickupsAndDeliveries::erasePoints(int neighborhoodSize, double percentageToErase)
 {
-	
 		cout << "The tours before erasing points  "<< endl;
 	for(int i = 0; i < solutionTours.size(); i++)
 	{
@@ -610,28 +677,24 @@ void OrienteeringProblemWithPickupsAndDeliveries::erasePoints(int neighborhoodSi
 	int posToErase;
 	for (int i=0; i<solutionTours.size();i++)  // The local search with shaking will be done for each tour 
 	{	
+		LoadCalculator currentLoad(load[i],goodsOnTheLorry[i], bufferPlus[i], bufferMinus[i], intensity[i], inputDataProcessor.getQuantities());
 		//vector <int> tour = solutionTours[i];
 		for (int k=1 ; k< (max(floor(percentageToErase*solutionTours[i].size()/neighborhoodSize), 2)) ; k++)  // Neighborhood size is increasing
 		{
-		posToErase=rand()%(solutionTours[i].size()-neighborhoodSize-1)+1;
+			posToErase=rand()%(solutionTours[i].size()-neighborhoodSize-1)+1;
 
 
-		for (int m = 0; m < neighborhoodSize; m++)
-		{
-			unvisitedNodes[solutionTours[i][posToErase+m]]=1;
-		}
+			for (int m = 0; m < neighborhoodSize; m++)
+			{
+				unvisitedNodes[solutionTours[i][posToErase+m]]=1;
+			}
 
-		solutionTours[i].erase(solutionTours[i].begin()+posToErase, solutionTours[i].begin()+posToErase+neighborhoodSize);
-		load[i].erase(load[i].begin()+posToErase, load[i].begin()+posToErase+neighborhoodSize);
-		bufferPlus[i].erase(bufferPlus[i].begin()+posToErase, bufferPlus[i].begin()+posToErase+neighborhoodSize);
-		bufferMinus[i].erase(bufferMinus[i].begin()+posToErase, bufferMinus[i].begin()+posToErase+neighborhoodSize);
-		
-		
-		
+			solutionTours[i].erase(solutionTours[i].begin()+posToErase, solutionTours[i].begin()+posToErase+neighborhoodSize);
+			LoadCalculator newLoad(load[i],goodsOnTheLorry[i], bufferPlus[i], bufferMinus[i], intensity[i], inputDataProcessor.getQuantities());
 		}
 	}
 
-		cout << "The tours after erasing points  "<< endl;
+	cout << "The tours after erasing points  "<< endl;
 	for(int i = 0; i < solutionTours.size(); i++)
 	{
 		cout << " The tour nr. " << i+1 << "  " ;
@@ -653,32 +716,34 @@ void OrienteeringProblemWithPickupsAndDeliveries::insertPoints(vector <Coordinat
 	int best=DBL_MIN;
 	int countTrials=0;
 	vector <int> unvisitedNodesForOneTour = unvisitedNodes;
+	int maxTrials=count(unvisitedNodesForOneTour.begin(), unvisitedNodesForOneTour.end(), 1);
 	bool insertionEnd=false;
 	unvisitedNodesForOneTour[0]=0;
 
 
 	while (insertionEnd!=true)
 	{
-
+		double minCost=DBL_MAX;
 		for (int i=0; i< unvisitedNodesForOneTour.size(); i++)
 		{
-			if (unvisitedNodesForOneTour[i]=1)
+			if (unvisitedNodesForOneTour[i]==1)
 			{
 				if (basicData[i].quantity >0) // if it is a pick up point
 				{
-					if (abs(basicData[i].profit) >best)   // The cheaper it costs, the better it is
+					if (abs(basicData[i].profit) < minCost)   // The cheaper it costs, the better it is
 					{
 					best= i;
+					minCost=abs(basicData[i].profit);
 					}
 				}
 			}
+		}
 
 			// 2. Choosing the best place to insert in the other tour
 			double minTourLengthExtension=DBL_MAX;
 			double TourLengthExtension;
 			int posToInsert;
 			bool criterion=false;
-			bool noLoadCapacityToInsert=false;
 			for (int i = 0; i < tour.size()-1; i++)
 			{
 				if (isTotalLengthUnderLimit( tour, best, i+1) && (basicData[best].quantity) < bufferPlus[whichTour][i+1] )
@@ -693,9 +758,9 @@ void OrienteeringProblemWithPickupsAndDeliveries::insertPoints(vector <Coordinat
 			}
 			if (minTourLengthExtension!=DBL_MAX)
 			{
-			solutionTours[whichTour].insert(tour.begin()+posToInsert, best);
+			solutionTours[whichTour].insert(solutionTours[whichTour].begin()+posToInsert, best);
 			intensity[whichTour].insert(intensity[whichTour].begin()+posToInsert, 1);
-			LoadCalculator newLoad( load[whichTour], goodsOnTheLorry[whichTour], bufferPlus[whichTour], bufferMinus[whichTour], intensity[whichTour]);
+			LoadCalculator newLoad( load[whichTour], goodsOnTheLorry[whichTour], bufferPlus[whichTour], bufferMinus[whichTour], intensity[whichTour], inputDataProcessor.getQuantities());
 			unvisitedNodes[best]=0;
 			insertionEnd=true;
 			}
@@ -704,11 +769,11 @@ void OrienteeringProblemWithPickupsAndDeliveries::insertPoints(vector <Coordinat
 			countTrials=countTrials+1;		
 		}
 
-		if (countTrials>unvisitedNodesForOneTour.size())
+		if (countTrials==maxTrials)
 		{
 		insertionEnd=true;
 		}
-	}
+	
 	
 	cout << "The tours after inserting points  "<< endl;
 	for(int i = 0; i < solutionTours.size(); i++)
@@ -720,6 +785,9 @@ void OrienteeringProblemWithPickupsAndDeliveries::insertPoints(vector <Coordinat
 		}
 		cout<<endl;
 	}
+
+	profitsOfAllTheTours();
+
 }
 
 void OrienteeringProblemWithPickupsAndDeliveries::doInsertion()
@@ -746,14 +814,14 @@ void OrienteeringProblemWithPickupsAndDeliveries::runShakingAndTwoopt()
 		{
 
 			int trials=0;
-			ProfitCalculator bestToursProfit ( bestTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity());
+			ProfitCalculator bestToursProfit ( bestTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity(), getTourLength(bestTours[i]));
 			while (trials<maxTrials)
 			{
 				shaking(tour,k);
 				makeTourFeasible (tour);
-				ProfitCalculator currentTour ( bestTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity());
+				ProfitCalculator currentTour ( bestTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity(), getTourLength(bestTours[i]));
 				doTwoOpt(0);
-				ProfitCalculator newTour( tour, inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity());
+				ProfitCalculator newTour( tour, inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity(), getTourLength(tour));
 
 				if (newTour.getProfit() > bestToursProfit.getProfit())
 				{
@@ -770,8 +838,8 @@ void OrienteeringProblemWithPickupsAndDeliveries::runShakingAndTwoopt()
 	}
 	for (int i=0 ; i< solutionTours.size();i++)
 	{
-		ProfitCalculator initialToursProfit( solutionTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity()); 
-		ProfitCalculator bestToursProfit( bestTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity()); 
+		ProfitCalculator initialToursProfit( solutionTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity(), getTourLength(solutionTours[i])); 
+		ProfitCalculator bestToursProfit( bestTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity(), getTourLength(bestTours[i])); 
 		cout << "Profit of the " << i+1 << ". tour: " << initialToursProfit.getProfit() << endl;
 		cout << "Profit of the  " << i+1 << ".tour after shaking and 2opt: " << bestToursProfit.getProfit() << endl;
 		//getTourFeasible(bestTours[i]);
@@ -782,7 +850,7 @@ void OrienteeringProblemWithPickupsAndDeliveries::runShakingAndTwoopt()
 
 double OrienteeringProblemWithPickupsAndDeliveries::getObjectiveValue(vector<int> tour)
 {
-	ProfitCalculator profit(tour, inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity());
+	ProfitCalculator profit(tour, inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity(), getTourLength(tour));
 	double objectiveValue =profit.getProfit() - getTourLength(tour);
 	return objectiveValue;
 }
@@ -791,7 +859,7 @@ double OrienteeringProblemWithPickupsAndDeliveries::getObjectiveValue(vector<int
 void OrienteeringProblemWithPickupsAndDeliveries::makeTourFeasible(vector <int> & solutionTour)
 {
 	vector <int> zeroIntensityIndices;
-	ProfitCalculator Profit (solutionTour, inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity());
+	ProfitCalculator Profit (solutionTour, inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity(), getTourLength(solutionTour));
 	zeroIntensityIndices=Profit.getZeroIntensityIndices();
 	while (getTourLength(solutionTour) > inputDataProcessor.getMaximumTourLength())
 	{
@@ -824,15 +892,15 @@ void OrienteeringProblemWithPickupsAndDeliveries::runStringExchangesAndTwoopt()
 		{
 
 			int trials=0;
-		ProfitCalculator bestToursProfit1 ( bestTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity());
-		ProfitCalculator bestToursProfit2 ( bestTours[i+1], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity());
+		ProfitCalculator bestToursProfit1 ( bestTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity(), getTourLength(tours[i]));
+		ProfitCalculator bestToursProfit2 ( bestTours[i+1], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity(), getTourLength(tours[i+1]));
 			while (trials<maxTrials)
 			{
 				stringExchanges(tours, tourNumber, k);
 				makeTourFeasible (tours[i+1]);
 				doTwoOpt(1);
-				ProfitCalculator newTour1( tours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity());
-				ProfitCalculator newTour2( tours[i+1], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity());
+				ProfitCalculator newTour1( tours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity(), getTourLength(tours[i]));
+				ProfitCalculator newTour2( tours[i+1], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity(), getTourLength(tours[i+1]));
 
 				if (( newTour2.getProfit() - bestToursProfit2.getProfit())> 0)
 				{
@@ -851,8 +919,8 @@ void OrienteeringProblemWithPickupsAndDeliveries::runStringExchangesAndTwoopt()
 
 	for (int i=0 ; i< solutionTours.size();i++)
 	{
-		ProfitCalculator initialToursProfit( solutionTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity()); 
-		ProfitCalculator bestToursProfit( bestTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity()); 
+		ProfitCalculator initialToursProfit( solutionTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity(), getTourLength(solutionTours[i])); 
+		ProfitCalculator bestToursProfit( bestTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity(), getTourLength(bestTours[i])); 
 		cout << "Profit of the " << i+1 << ". tour: " << initialToursProfit.getProfit() << endl;
 		cout << "Profit of the  " << i+1 << ".tour after shaking and 2opt: " << bestToursProfit.getProfit() << endl;
 		//getTourFeasible(bestTours[i]);

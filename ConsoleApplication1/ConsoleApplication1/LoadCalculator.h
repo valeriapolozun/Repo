@@ -13,8 +13,8 @@ using namespace std;
 class LoadCalculator
 {
 	public:
-	LoadCalculator (std::vector <int> & load, std::vector <int> & goodsOnTheLorry, std::vector <int> & bufferPlus, std:: vector <int> & bufferMinus, std:: vector <double> intensity);
-	void loadCalculation (vector <int> & load, vector <int> & goodsOnTheLorry, vector <double> intensity);
+	LoadCalculator (std::vector <int> & load, std::vector <int> & goodsOnTheLorry, std::vector <int> & bufferPlus, std:: vector <int> & bufferMinus, std:: vector <double> intensity, vector <int> quantities);
+	void loadCalculation (vector <int> & load, vector <int> & goodsOnTheLorry, vector <double> intensity, vector <int> quantities);
 	vector <int> load;
 	void bufferPlusCalculation(vector <int> goodsOnTheLorry, vector <int> & bufferPlus);
 	void bufferMinusCalculation ( vector <int> goodsOnTheLorry, vector <int> & bufferMinus);

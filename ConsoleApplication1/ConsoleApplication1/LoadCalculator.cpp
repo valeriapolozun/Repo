@@ -5,24 +5,29 @@
 
 using namespace std;
 
-LoadCalculator:: LoadCalculator (vector <int> & load, vector <int> & goodsOnTheLorry, vector <int> & bufferPlus, vector <int> & bufferMinus, vector<double> intensity)
+LoadCalculator:: LoadCalculator (vector <int> & load, vector <int> & goodsOnTheLorry, vector <int> & bufferPlus, vector <int> & bufferMinus, vector<double> intensity, vector <int> quantities)
 {
+	load.clear();
+	goodsOnTheLorry.clear();
+	bufferPlus.clear();
+	bufferMinus.clear();
+
 	//maxCapacity = & OrienteeringProblemWithPickupsAndDeliveries::maxCapacity;
 	maxCapacity= 300;
-	loadCalculation (load, goodsOnTheLorry, intensity);
+	loadCalculation (load, goodsOnTheLorry, intensity, quantities);
 	bufferPlusCalculation( goodsOnTheLorry, bufferPlus);
 	bufferMinusCalculation (  goodsOnTheLorry, bufferMinus);
 }
 
 
 
-void LoadCalculator::loadCalculation(vector <int> & load, vector <int> & goodsOnTheLorry, vector <double> intensity)
+void LoadCalculator::loadCalculation(vector <int> & load, vector <int> & goodsOnTheLorry, vector <double> intensity, vector <int> quantities)
 {
 	load.push_back(0);
 	goodsOnTheLorry.push_back(0);
 	for (int i=1; i < intensity.size(); i++)
 	{
-		 load.push_back(intensity[i]*basicData[i].quantity);
+		 load.push_back(intensity[i]*quantities[i]);
 		 goodsOnTheLorry.push_back( goodsOnTheLorry[i-1]+ load[i]);
 	}
 }

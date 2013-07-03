@@ -1,0 +1,99 @@
+Old Code- TourPickupDeliveryPointPairs.
+
+
+
+
+
+				/* old code
+
+				if (isTotalLengthUnderLimit( tour, bestPairs[0], j+1) /*&& (inputDataProcessor.getQuantity(bestPairs[0])) < bufferPlus[whichTour][i+1] )
+				{
+					TourLengthExtension= inputDataProcessor.getDistance (tour[j], bestPairs[0])+ inputDataProcessor.getDistance (bestPairs[0], tour[j+1]);
+					if (TourLengthExtension < minTourLengthExtension) 
+					{
+						minTourLengthExtension=TourLengthExtension;
+						posToInsert= j+1;
+					}
+				}
+			}
+			
+			if (minTourLengthExtension!=DBL_MAX)
+			{
+				tour.insert(tour.begin()+posToInsert, bestPairs[0]);
+				//intensity[whichTour].insert(intensity[whichTour].begin()+posToInsert, 1);
+				//LoadCalculator newLoad( load[whichTour], goodsOnTheLorry[whichTour], bufferPlus[whichTour], bufferMinus[whichTour], intensity[whichTour], inputDataProcessor.getQuantities());
+				unvisitedNodes[bestPairs[0]]=0;
+				unvisitedNodesForOneTour[bestPairs[0]]=0;
+				pickupInserted=true;
+			}
+			else
+			{
+				//wrongPairs[whichTour].push_back(bestPairs);
+				//profitPerDistanceMatrix[bestPairs[0]] [bestPairs[1]]=-DBL_MAX;
+				unvisitedNodesForOneTour[bestPairs[0]]=0;
+				//bestPairs[0]=0;
+				//bestPairs[1]=0;
+			}
+
+
+
+			if (pickupInserted)  // After inserting pickup, the delivery point will be inserted
+			{
+				for (int j = posToInsert; j< tour.size()-1; j++)
+				{
+					{
+						minTourLengthExtension=DBL_MAX;
+						if (isTotalLengthUnderLimit( tour, bestPairs[1], j+1) )//&& (inputDataProcessor.getQuantity(bestPairs[1])) < bufferPlus[whichTour][i+1])
+						{
+							TourLengthExtension= inputDataProcessor.getDistance (tour[j], bestPairs[1])+ inputDataProcessor.getDistance (bestPairs[1], tour[j+1]);
+							if (TourLengthExtension < minTourLengthExtension) 
+							{
+							minTourLengthExtension=TourLengthExtension;
+							posToInsert= j+1;
+							}	
+						}
+					}
+				}
+
+				if (minTourLengthExtension!=DBL_MAX)
+				{
+					tour.insert(tour.begin()+posToInsert, bestPairs[1]);
+				//intensity[whichTour].insert(intensity[whichTour].begin()+posToInsert, 1);
+				//LoadCalculator newLoad( load[whichTour], goodsOnTheLorry[whichTour], bufferPlus[whichTour], bufferMinus[whichTour], intensity[whichTour], inputDataProcessor.getQuantities());
+					unvisitedNodesForOneTour[bestPairs[1]]=0;
+					unvisitedNodes[bestPairs[1]]=0;
+				}
+				else
+				{
+					/*wrongPairs[whichTour].push_back(bestPairs);
+					profitPerDistanceMatrix[bestPairs[0]] [bestPairs[1]]=-DBL_MAX;
+					bestPairs[0]=0;
+					bestPairs[1]=0;
+	
+					unvisitedNodesForOneTour[bestPairs[1]]=0;
+				}
+
+			}
+	}
+			/*
+			if (isTotalLengthUnderLimit2Nodes(tour, bestPairs))
+			{
+				for (int i = 0; i < bestPairs.size(); i++)
+				{
+					tour.push_back(bestPairs[i]);
+					unvisitedNodesForOneTour[bestPairs[i]]=0;
+					unvisitedNodes[bestPairs[i]]=0;
+				}
+			}
+			else
+			{
+				wrongPairs[whichTour].push_back(bestPairs);
+				profitPerDistanceMatrix[bestPairs[0]] [bestPairs[1]]=-DBL_MAX;
+				bestPairs[0]=0;
+				bestPairs[1]=0;
+			}
+			
+		}
+	}
+
+	*/

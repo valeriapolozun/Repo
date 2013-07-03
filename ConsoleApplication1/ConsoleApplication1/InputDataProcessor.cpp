@@ -28,6 +28,25 @@ double InputDataProcessor::getMaximumLoadCapacity()
 	return lMax;
 }
 
+vector <int> InputDataProcessor::getQuantities()
+{
+	for (int i=0; i<basicData.size();i++)
+	{
+	quantities.push_back(basicData[i].quantity);
+	}
+	return quantities;
+}
+
+
+int InputDataProcessor::getQuantity(int node)
+{
+	return basicData[node].quantity;
+}
+
+
+
+
+
 InputDataProcessor::InputDataProcessor()
 {
 }

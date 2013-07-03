@@ -18,10 +18,15 @@ public:
 	int getProblemSize();
 	double getDistance(int from, int to);
 	void Rsavesinstance(std::string fname);
+	std::vector<Coordinates> basicData;
+	vector <int> getQuantities();
+	int getQuantity(int node);
 
 
 protected:
 	double dMax; // maximum tour length
+	vector <int> quantities;
+
 
 private:
 	void readData(const std::string& inputFile);
@@ -30,7 +35,7 @@ private:
 
 	
 	double lMax; // maximum load capacity
-	std::vector<Coordinates> basicData;
+	
 	int problemSize;
 	std::vector < std::vector <double> > distanceMatrix;
 };

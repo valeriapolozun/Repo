@@ -10,7 +10,7 @@ using namespace std;
 class ProfitCalculator
 {
 	public:
-	ProfitCalculator(std::vector <int> tourInput,std::vector <Coordinates> basicDataInput, double maxCapacityInput);
+	ProfitCalculator(std::vector <int> tourInput,std::vector <Coordinates> basicDataInput, double maxCapacityInput, double tourLength);
 	double getProfit();
 	std:: vector <int> getZeroIntensityIndices();
 	void savesol(string fname);
