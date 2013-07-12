@@ -86,6 +86,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Coordinates.h" />
+    <ClInclude Include="ExcelExporter.h" />
+    <ClInclude Include="ProfitCalculatorOhneGLPK.h" />
     <ClInclude Include="InputDataProcessor.h" />
     <ClInclude Include="LoadCalculator.h" />
     <ClInclude Include="OrienteeringProblemWithPickupsAndDeliveries.h" />
@@ -103,10 +105,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConsoleApplication1.cpp" />
+    <ClCompile Include="ExcelExporter.cpp" />
     <ClCompile Include="InputDataProcessor.cpp" />
     <ClCompile Include="OrienteeringProblemWithPickupsAndDeliveries.cpp" />
     <ClCompile Include="ProfitCalculator.cpp" />
     <ClCompile Include="LoadCalculator.cpp" />
+    <ClCompile Include="ProfitCalculatorOhneGLPK.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="TourDefault.cpp" />
     <ClCompile Include="TourFirstPickupSecondDelivery.cpp" />

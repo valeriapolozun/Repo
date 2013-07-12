@@ -37,6 +37,18 @@ vector <int> InputDataProcessor::getQuantities()
 	return quantities;
 }
 
+vector <int> InputDataProcessor::getTourQuantities(vector <int> tour)
+{
+	for (int i=0; i<tour.size();i++)
+	{
+	tourquantities.push_back(basicData[tour[i]].quantity);
+	}
+	return tourquantities;
+}
+
+
+
+
 
 int InputDataProcessor::getQuantity(int node)
 {

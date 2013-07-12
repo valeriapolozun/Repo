@@ -98,7 +98,7 @@ void TourPickupDeliveryPointPairs::calcTourChoosePickupAndDeliveryPointPairs2(in
 						{
 						node2pos=tour[k];
 						}
-						TourLengthExtension= inputDataProcessor.getDistance (tour[j], bestPairs[0])+ inputDataProcessor.getDistance (bestPairs[0], tour[j+1])+inputDataProcessor.getDistance (node2pos, bestPairs[1])+ inputDataProcessor.getDistance (bestPairs[1], tour[k+1]);
+						TourLengthExtension= inputDataProcessor.getDistance (tour[j], bestPairs[0])+ inputDataProcessor.getDistance (bestPairs[0], tour[j+1])-inputDataProcessor.getDistance (tour[j], tour[j+1])+inputDataProcessor.getDistance (node2pos, bestPairs[1])+ inputDataProcessor.getDistance (bestPairs[1], tour[k+1])-+ inputDataProcessor.getDistance (node2pos, tour[k+1]);;
 						if (TourLengthExtension < minTourLengthExtension) 
 						{
 							minTourLengthExtension=TourLengthExtension;

@@ -3,6 +3,7 @@
 
 
 #include "Coordinates.h"
+#include "time.h"
 #include <vector>
 #include <string>
 using namespace std;
@@ -10,11 +11,12 @@ using namespace std;
 class ProfitCalculator
 {
 	public:
-	ProfitCalculator(std::vector <int> tourInput,std::vector <Coordinates> basicDataInput, double maxCapacityInput, double tourLength);
+	double time_c;
+	ProfitCalculator(std::vector <int> tourInput,std::vector <Coordinates> basicDataInput, double maxCapacityInput, double tourLength, clock_t clock_start, clock_t clockStartThisSolution );
 	double getProfit();
 	std:: vector <int> getZeroIntensityIndices();
 	void savesol(string fname);
-	
+
 	void loadCalculation( vector <int> & load, vector <int> & goodsOnTheLorry);
 	void bufferPlusCalculation(vector <int> goodsOnTheLorry, vector <int> & bufferPlus);
 	void bufferMinusCalculation(vector <int> goodsOnTheLorry, vector <int> & bufferMinus);
@@ -25,6 +27,7 @@ class ProfitCalculator
 	double intensityCalculation();	
 
 	std:: vector<int> tour;
+	double tourLength;
 	double maxCapacity;
 	std:: vector<Coordinates> basicData;
 	std::vector <double> vectorMaxQuantities;

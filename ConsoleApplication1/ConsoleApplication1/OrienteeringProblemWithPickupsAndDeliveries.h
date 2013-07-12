@@ -6,17 +6,23 @@
 #include "InputDataProcessor.h"
 #include "Coordinates.h"
 #include "ProfitCalculator.h"
+#include "ProfitCalculatorOhneGLPK.h"
 
 class OrienteeringProblemWithPickupsAndDeliveries
 {
 public:
+
 	OrienteeringProblemWithPickupsAndDeliveries(std::string inputFile);
 	~OrienteeringProblemWithPickupsAndDeliveries();
 
 	//void calcOtherToursNearestNeighborDistanceLimit(vector<int> tour);
 	
+
+	
 	bool isThereUnvisitedNodes();
 	void profitsOfAllTheTours();
+	void profitsOfAllTheToursOhneGLPK();
+	void printSolutions();
 
 	void runNearestNeighborDistanceLimit();
 	void runFirstPickupSecondDeliveryPoint();
@@ -28,10 +34,14 @@ public:
 	string rexe;
 	string rpath;
 	string filename;
+	std::vector <std::vector <double>> totalFinalSolutions;
+	void runExcelExporter();
+	void runExcelExport(); // csv file
 	//string extension;
 	
 	
-	void Rprintsol(string rexe, string rpath, string filename, ProfitCalculator solution, int i);
+	void Rprintsol(string rexe, string rpath, string filename, ProfitCalculator solution, int i, int & count);
+	void Rprintsol2(string rexe, string rpath, string filename, ProfitCalculatorOhneGLPK solution, int i, int & countSolutionRuns);
 
 	void doTwoOpt(int whichTour);
 	void erasePoints(int neighborhoodSize, double percentageToErase);
@@ -70,6 +80,15 @@ protected:
 	std::vector <std::vector <double> >  intensity;
 	vector <int> quantities;
 	void calcPickupDeliveryPointPairs();
+	vector <double> finalSolutions;
+	
+	int countSolutionRuns;
+	int getNextPickupPointRandomised(vector <int> unvisitedPickups, vector <int> unvisitedDeliveries, int startNode);
+	void pickupPoint (std::vector<int> & nodes);
+	void deliveryPoint (std::vector<int> & nodes);
+	vector <int> pickupPoints;
+	vector <int> deliveryPoints;
+	int closestPoint( int node, vector <int> tour);
 
 
 private:
@@ -79,6 +98,7 @@ private:
 	int getHighestDemandInNeighborhood(std::vector<int> unvisitedCities, int startNode);
 	
 	void changeOrderPartOfTour( std::vector <int> & tour, int from, int to);
+	void changeOrderPartOfTourDouble ( vector <double> & tour, int from, int to);
 	void shaking(std::vector <int> & tour, int neighborhoodSize);
 	void makeTourFeasible(std::vector <int> & solutionTour);
 	void stringExchanges(std::vector <std::vector <int> > & tours,int tourNumber, int neighborhoodSize);

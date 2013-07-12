@@ -20,13 +20,14 @@ public:
 	void Rsavesinstance(std::string fname);
 	std::vector<Coordinates> basicData;
 	vector <int> getQuantities();
+	vector <int> getTourQuantities(vector <int> tour);
 	int getQuantity(int node);
 
 
 protected:
 	double dMax; // maximum tour length
 	vector <int> quantities;
-
+		vector <int> tourquantities;
 
 private:
 	void readData(const std::string& inputFile);

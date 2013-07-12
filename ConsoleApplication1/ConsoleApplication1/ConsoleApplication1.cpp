@@ -9,11 +9,13 @@
 #include "TourPickupDeliveryPointPairsParallelBest.h"
 #include "TourPickupDeliveryPointPairsParallel.h"
 #include "TourGreedyEinzelnePunkteSeriell.h"
+#include "ExcelExporter.h"
 
 using namespace std;
 
+
+
 int main(int argc, char **argv) {
-	
 
 	// The tours are generated in different algorithms based on the input files.
 
@@ -56,14 +58,25 @@ int main(int argc, char **argv) {
 
 	//TourPickupDeliveryPointPairsParallel pickupdeliverypairsparallel("set_64_1_50_300.txt");
 
-	//TourPickupDeliveryPointPairsParallelBest pickupdeliverypairsparallelbestofalltours("set_64_1_50_300small.txt");
-
-
-	
-	TourGreedyEinzelnePunkteSeriell tourgreedyeinzeln("set_64_1_50_300.txt");
+	//TourPickupDeliveryPointPairsParallelBest pickupdeliverypairsparallelbestofalltours("set_64_1_50_300.txt");
+	//pickupdeliverypairsparallelbestofalltours.runTwoOpt();
 
 	/*
+	for (int i=0; i<10; i++)
+	{
+	pickupdeliverypairsparallelbestofalltours.erasePoints(1, 0.1);
+	pickupdeliverypairsparallelbestofalltours.doInsertion();
+	pickupdeliverypairsparallelbestofalltours.runTwoOpt();
+	}
+	*/
+	
+	
+	TourGreedyEinzelnePunkteSeriell tourgreedyeinzeln("set_64_1_50_300.txt");
+	tourgreedyeinzeln.runExcelExport();
+	tourgreedyeinzeln.runTwoOpt();
+	tourgreedyeinzeln.runExcelExport();
 
+	/*
 	tourgreedyeinzeln.erasePoints(1, 0.1);
 	tourgreedyeinzeln.erasePoints(1, 0.1);
 	tourgreedyeinzeln.erasePoints(1, 0.1);

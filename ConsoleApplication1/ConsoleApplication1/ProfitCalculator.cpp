@@ -7,7 +7,7 @@
 
 using namespace std;
 
-ProfitCalculator:: ProfitCalculator(std::vector <int> tourInput,std::vector <Coordinates> basicDataInput, double maxCapacityInput, double tourLength) 
+ProfitCalculator:: ProfitCalculator(std::vector <int> tourInput,std::vector <Coordinates> basicDataInput, double maxCapacityInput, double tourLengthInput, clock_t clock_start, clock_t clockStartThisSolution ) 
 {
 	upperbound = - 1;
 	CPUtime = 0;
@@ -15,6 +15,7 @@ ProfitCalculator:: ProfitCalculator(std::vector <int> tourInput,std::vector <Coo
 	CPUtimetotal = 0;
 
 	tour=tourInput;
+	tourLength=tourLengthInput;
 	maxCapacity= maxCapacityInput;
 	for (int i = 0; i < tour.size(); i++)
 	{
@@ -24,6 +25,8 @@ ProfitCalculator:: ProfitCalculator(std::vector <int> tourInput,std::vector <Coo
 	calculateProfit();
 
 	result=result-tourLength ;
+	time_c= ((clock()- clockStartThisSolution)*1000)/CLOCKS_PER_SEC/1000;
+	CPUtimetotal=(double)((clock()- clock_start)*1000)/CLOCKS_PER_SEC/1000;
 
 }
 
