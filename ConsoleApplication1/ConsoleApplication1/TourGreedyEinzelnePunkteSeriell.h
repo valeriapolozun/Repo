@@ -30,7 +30,7 @@ class TourGreedyEinzelnePunkteSeriell: public OrienteeringProblemWithPickupsAndD
 	int getNextPickupPoint(std::vector <int> unvisitedPickups, std::vector <int> unvisitedDeliveries, int startNode);
 	int getNextPickupPointRandomised(vector <int> unvisitedPickups, vector <int> unvisitedDeliveries, int startNode, vector<int> tour);
 	int getNextDeliveryPoint(std::vector <int> unvisitedPickups, std::vector <int> unvisitedDeliveries, int startNode);
-	int getNextDeliveryPointRandomised(vector <int> unvisitedPickups, vector <int> unvisitedDeliveries, int startNode);
+	int getNextDeliveryPointRandomised(vector <int> unvisitedPickups, vector <int> unvisitedDeliveries, int startNode, vector <int> tour);
 	void putPointInBestPosition(int whichTour, int pointToInsert);
 	void putDeliveryPointInBestPosition(int whichTour, int pointToInsert, int pickupInsertedPosition);
 	int closestPoint( int node, vector <int> tour);

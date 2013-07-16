@@ -94,10 +94,10 @@ void OrienteeringProblemWithPickupsAndDeliveries::calcPickupDeliveryPointPairs()
 			}
 			else
 			{
-				travelDistance = inputDataProcessor.getDistance(i, j);
+				//travelDistance = inputDataProcessor.getDistance(i, j);
 				if ( basicData[i].quantity>0)
 				{
-					profitPerDistanceMatrix[i][j]= (basicData[i].profit-basicData[j].profit)*min(basicData[i].quantity,-(basicData[j].quantity))/(2*travelDistance);
+					profitPerDistanceMatrix[i][j]= (basicData[i].profit-basicData[j].profit)*min(basicData[i].quantity,-(basicData[j].quantity));
 				}
 				else
 				{
@@ -156,10 +156,10 @@ void OrienteeringProblemWithPickupsAndDeliveries::getProfitMatrixForPickupAndDel
 			}
 			else
 			{
-			travelDistance = inputDataProcessor.getDistance(startNode, i)+inputDataProcessor.getDistance(i, j)+inputDataProcessor.getDistance(j, 1);
+			//travelDistance = inputDataProcessor.getDistance(startNode, i)+inputDataProcessor.getDistance(i, j)+inputDataProcessor.getDistance(j, 1);
 			if ( basicData[i].quantity>0)
 			{
-			profitPerDistanceMatrix[i][j]= (basicData[i].profit-basicData[j].profit)*min(basicData[i].quantity,-(basicData[j].quantity))/travelDistance;
+			profitPerDistanceMatrix[i][j]= (basicData[i].profit-basicData[j].profit)*min(basicData[i].quantity,-(basicData[j].quantity));
 			}
 			else
 			{
@@ -423,6 +423,7 @@ void OrienteeringProblemWithPickupsAndDeliveries::profitsOfAllTheToursOhneGLPK()
 		{
 		ProfitCalculatorOhneGLPK profitohneGLPK( solutionTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity(), getTourLength(solutionTours[i]), intensity[i], clock_start, clockStartThisSolution); 
 		finalSolutions.push_back( profitohneGLPK.getProfit());
+		finalSolutions.push_back (getTourLength(solutionTours[i]));
 		cout << "Profit of the " << i+1 << ". tour ohne GLPK: " << profitohneGLPK.getProfit() << endl;
 		result= result+ profitohneGLPK.getProfit();
 		Rprintsol2(rexe, rpath, filename, profitohneGLPK, i, countSolutionRuns);
@@ -432,7 +433,6 @@ void OrienteeringProblemWithPickupsAndDeliveries::profitsOfAllTheToursOhneGLPK()
 	}
 	finalSolutions.push_back(result);
 	finalSolutions.push_back(time);
-	
 	totalFinalSolutions.push_back(finalSolutions);
 	cout << "The total profit of the tours all together :  " << result << endl;
 	cout << "The tours:    "<< endl;
@@ -459,6 +459,7 @@ void OrienteeringProblemWithPickupsAndDeliveries::profitsOfAllTheTours()
 
 		ProfitCalculator initialToursProfit( solutionTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity(), getTourLength(solutionTours[i]), clock_start, clockStartThisSolution); 
 		finalSolutions.push_back( initialToursProfit.getProfit());
+		finalSolutions.push_back (getTourLength(solutionTours[i]));
 		vector <double> intensityToInsert=  initialToursProfit.getIntensity();
 		intensity.push_back(intensityToInsert);
 		
@@ -469,7 +470,9 @@ void OrienteeringProblemWithPickupsAndDeliveries::profitsOfAllTheTours()
 	}
 	finalSolutions.push_back(result);
 	finalSolutions.push_back(time);
+
 	totalFinalSolutions.push_back(finalSolutions);
+
 	cout << "The total profit of the tours all together :  " << result << endl;
 	cout << "The tours:    "<< endl;
 	for(int i = 0; i < solutionTours.size(); i++)
@@ -588,13 +591,9 @@ void OrienteeringProblemWithPickupsAndDeliveries::doTwoOpt(int whichTour)
 	n= solutionTours[whichTour].size();
 	bool criterion=true;
 	double temp;
-	/*
-	ProfitCalculator currentTour ( solutionTours[whichTour], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity(), getTourLength(solutionTours[whichTour]));
-	intensity[whichTour]=currentTour.getIntensity();
 	
-	/*vector <double> intensityToInsert=  currentTour.getIntensity();
-	intensity.push_back(intensityToInsert);
-	*/
+
+	LoadCalculator loadCalculation(load[whichTour], goodsOnTheLorry[whichTour], bufferPlus[whichTour], bufferMinus[whichTour], intensity[whichTour], inputDataProcessor.getTourQuantities(solutionTours[whichTour]));
 
 	while (criterion)
 	{
@@ -611,23 +610,25 @@ void OrienteeringProblemWithPickupsAndDeliveries::doTwoOpt(int whichTour)
 				if ( (inputDataProcessor.getDistance(solutionTours[whichTour][i-1], solutionTours[whichTour][j])+inputDataProcessor.getDistance(solutionTours[whichTour][i], solutionTours[whichTour][j+1])) <  (inputDataProcessor.getDistance(solutionTours[whichTour][i-1], solutionTours[whichTour][i])+inputDataProcessor.getDistance(solutionTours[whichTour][j], solutionTours[whichTour][j+1])))
 				{
 					
-					LoadCalculator loadCalculation(load[whichTour], goodsOnTheLorry[whichTour], bufferPlus[whichTour], bufferMinus[whichTour], intensity[whichTour], inputDataProcessor.getTourQuantities(solutionTours[whichTour]));
+					//LoadCalculator loadCalculation(load[whichTour], goodsOnTheLorry[whichTour], bufferPlus[whichTour], bufferMinus[whichTour], intensity[whichTour], inputDataProcessor.getTourQuantities(solutionTours[whichTour]));
 					
 					changeOrderPartOfTour(load[whichTour], i, j);
-					
-				/*
-					double temp= load[whichTour][i];
-					load[whichTour][i]=load[whichTour][j];
-					load[whichTour][j]= temp;
-				*/
 					vector <int> goodsOnLoad(goodsOnTheLorry[whichTour]);
 					int feasible=1;
 					goodsOnLoad[0]= 0;
-					for (int k=1; k < load[whichTour].size(); k++)
+					for (int k=i; k < goodsOnLoad.size(); k++) // for (int k=1; k < load[whichTour].size(); k++)
 					{
 						goodsOnLoad[k]=goodsOnLoad[k-1]+load[whichTour][k];
 					}
 					
+
+					/*
+					for (int k=i; k < j+1; k++)
+					{
+						goodsOnTheLorry[whichTour][k]=goodsOnTheLorry[whichTour][k-1] + load[whichTour][k];
+					}
+					*/
+
 					for (int m=0; m < goodsOnLoad.size(); m++)
 					{
 						if ((goodsOnLoad[m]<0) || goodsOnLoad[m]>inputDataProcessor.getMaximumLoadCapacity())
@@ -637,22 +638,17 @@ void OrienteeringProblemWithPickupsAndDeliveries::doTwoOpt(int whichTour)
 						break;
 						}	
 					}
-					
+		
 					if (feasible==1) // Der Tausch ist zulässig
 					{
 						changeOrderPartOfTour(solutionTours[whichTour], i, j);
 						changeOrderPartOfTourDouble(intensity[whichTour], i, j);
-
-						/* CHANGE ONLY IF THE PROFIT GOT BETTER?*/
+						for (int k=i; k < j+1; k++)
+						{
+							goodsOnTheLorry[whichTour][k]=goodsOnTheLorry[whichTour][k-1] + load[whichTour][k];
+						}
 						ProfitCalculatorOhneGLPK newProfit ( solutionTours[whichTour], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity(), getTourLength(solutionTours[whichTour]), intensity[whichTour], clock_start, clockStartThisSolution);
 						cout << "The new profit is:   " << newProfit.getProfit() << endl;
-						
-						/*
-						if (newProfit.getProfit()< currentTour.getProfit())
-						{
-							changeOrderPartOfTour(solutionTours[whichTour], i, j);
-						}
-						*/
 						
 						criterion=true;
 						break;
@@ -699,7 +695,7 @@ void OrienteeringProblemWithPickupsAndDeliveries::changeOrderPartOfTourDouble ( 
 {
 	while (from<to)
 	{
-		int tmp = tour[from];
+		double tmp = tour[from];
 		tour[from]=tour [to];
 		tour[to]=tmp;
 		from++;
@@ -1268,7 +1264,8 @@ void OrienteeringProblemWithPickupsAndDeliveries::runExcelExport()
 
 	for(int i=0; i<numberOfTours; i++)
 	{ 
-	MyExcelFile << "Profit Tour"<< i+1 << ";";
+	MyExcelFile << "Profit T"<< i+1 << ";";
+	MyExcelFile << "Tourlength T" << i+1 << ";";
 	}
 
 	MyExcelFile << "Total Profit" << ";";
@@ -1278,7 +1275,7 @@ void OrienteeringProblemWithPickupsAndDeliveries::runExcelExport()
 	 { 
 		for(int j=0; j<colCount; j++) 
 		{ 
-			MyExcelFile << totalFinalSolutions[i][j] << ";";
+			MyExcelFile << "=\"" << totalFinalSolutions[i][j] << "\"" << ";";
 		}	
 		MyExcelFile	<< endl;
 	 }

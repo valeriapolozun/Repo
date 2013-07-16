@@ -59,10 +59,16 @@ void TourGreedyEinzelnePunkteSeriell::calcTourChoosePickupAndDeliveryPointPairs(
 	for (int i = 0; i < maxRun; i++)
 	{
 		//startNode=getNextPickupPoint( pickupPoints, deliveryPoints, startNode);
-		startNode=getNextPickupPointRandomised( pickupPoints, deliveryPoints, *(solutionTours[whichTour].end()-1), solutionTours[whichTour]);
+		startNode=getNextPickupPointRandomised( pickupPoints, deliveryPoints, *(solutionTours[whichTour].end()-2), solutionTours[whichTour]);
 
 		putPointInBestPosition( whichTour, startNode);
+
 		unvisitedNodesForOneTour[startNode]=0;
+
+		if (startNode==1)
+		{
+		cout << "error";
+		}
 
 		/*
 		if (isTotalLengthUnderLimit(tour, startNode))
@@ -85,10 +91,18 @@ void TourGreedyEinzelnePunkteSeriell::calcTourChoosePickupAndDeliveryPointPairs(
 		{
 
 			//startNode=getNextDeliveryPoint(pickupPoints, deliveryPoints, startNode);
-			startNode=getNextDeliveryPointRandomised(pickupPoints, deliveryPoints, lastPickupInserted);
+			startNode=getNextDeliveryPointRandomised(pickupPoints, deliveryPoints, lastPickupInserted, solutionTours[whichTour]);
 
 			//putPointInBestPosition( whichTour, startNode);
+
+			if (startNode==1)
+			{
+			cout << "error";
+			}
+
+
 			putDeliveryPointInBestPosition(whichTour, startNode, pickupInsertedPosition);
+			unvisitedNodesForOneTour[startNode]=0;
 
 			for (int j = 0; j < deliveryPoints.size(); j++)
 			{
@@ -96,6 +110,11 @@ void TourGreedyEinzelnePunkteSeriell::calcTourChoosePickupAndDeliveryPointPairs(
 				{
 					deliveryPoints.erase(deliveryPoints.begin() + j);
 				}
+			}
+
+			if (startNode==0) // no more delivery can be inserted!
+			{
+			deliveryPoints.clear();
 			}
 
 		//unvisitedNodesForOneTour[startNode]=0;
@@ -196,35 +215,43 @@ int TourGreedyEinzelnePunkteSeriell::getNextPickupPointRandomised(vector <int> u
     double min = DBL_MAX;
     int bestToChoose = startNode;
 	double profitsWithOtherDeliveryPoints=0;
-	double profitValue;
+	double profitValue=0;
 	vector <double> cumulatedProfits;
 	cumulatedProfits.push_back(0);
 	double randNumber;
 	double max;
     for(int i=0; i< unvisitedPickups.size(); i++)
     {
-		max=DBL_MIN;
+		max=0;
         for(int j=0; j< unvisitedDeliveries.size(); j++)
 		{
-			profitValue=profitPerDistanceMatrix[unvisitedPickups[i]][unvisitedDeliveries[j]] / (inputDataProcessor.getDistance(closestPoint(unvisitedPickups[i],tour), unvisitedPickups[i]));
+			if (inputDataProcessor.getDistance(closestPoint(unvisitedDeliveries[j],tour), unvisitedDeliveries[j])< inputDataProcessor.getDistance(closestPoint(unvisitedPickups[i],tour), unvisitedPickups[i]))
+			{
+				profitValue=profitPerDistanceMatrix[unvisitedPickups[i]][unvisitedDeliveries[j]] / (inputDataProcessor.getDistance(closestPoint(unvisitedPickups[i],tour), unvisitedPickups[i]));
+			}
 			if (profitValue>max)
 			{
-				max=profitPerDistanceMatrix[unvisitedPickups[i]][unvisitedDeliveries[j]]/(inputDataProcessor.getDistance(closestPoint(unvisitedPickups[i],tour), unvisitedPickups[i]));
+				//max=profitPerDistanceMatrix[unvisitedPickups[i]][unvisitedDeliveries[j]]/(inputDataProcessor.getDistance(closestPoint(unvisitedPickups[i],tour), unvisitedPickups[i]));
+				max=profitValue;
 			}
 		}
 		
 			//profitValue=profitPerDistanceMatrix [unvisitedPickups[i]][unvisitedDeliveries[j]] /((inputDataProcessor.getDistance(startNode, unvisitedPickups[i])*10));	
 			
+		/*
 			if (max>0)
 			{
 			profitsWithOtherDeliveryPoints= profitsWithOtherDeliveryPoints + max;
 			}
-	
+		*/
 		//
+		/*
 		if (profitsWithOtherDeliveryPoints>0)
 		{
-			cumulatedProfits.push_back(cumulatedProfits.back()+profitsWithOtherDeliveryPoints);	
-		}
+		*/
+		cumulatedProfits.push_back(cumulatedProfits.back() + max);//+profitsWithOtherDeliveryPoints);	
+	/*	
+	}
 		else
 		{
 			cumulatedProfits.push_back(cumulatedProfits.back());
@@ -232,7 +259,9 @@ int TourGreedyEinzelnePunkteSeriell::getNextPickupPointRandomised(vector <int> u
 		
 
 		profitsWithOtherDeliveryPoints=0;
-    }
+    */
+	}
+	
    
 	double total=cumulatedProfits.back();
 	//srand(time(NULL));
@@ -271,25 +300,44 @@ int TourGreedyEinzelnePunkteSeriell::getNextDeliveryPoint(vector <int> unvisited
     return bestToChoose;
 }
 
-int TourGreedyEinzelnePunkteSeriell::getNextDeliveryPointRandomised(vector <int> unvisitedPickups, vector <int> unvisitedDeliveries, int startNode)
+int TourGreedyEinzelnePunkteSeriell::getNextDeliveryPointRandomised(vector <int> unvisitedPickups, vector <int> unvisitedDeliveries, int startNode,vector <int> tour)
 {
    
-    int bestToChoose = startNode;
+    int bestToChoose = 0;
 	double profitsToGet=0;
+	double profitValue=0;
 	double quantityToTransfer;
 	vector <double> cumulatedDistances;
 	double travelDistance;
 	cumulatedDistances.push_back(0);
 	double randNumber;
+	double max;
     for(int i=0; i< unvisitedDeliveries.size(); i++)
     {
+		max=0;
+		 for(int j=0; j< unvisitedPickups.size(); j++)
+		{
+			if (inputDataProcessor.getDistance(closestPoint(unvisitedPickups[j],tour), unvisitedPickups[j])< inputDataProcessor.getDistance(closestPoint(unvisitedDeliveries[i],tour), unvisitedDeliveries[i]))
+			{
+				profitValue=profitPerDistanceMatrix[unvisitedPickups[j]][unvisitedDeliveries[i]] / (inputDataProcessor.getDistance(closestPoint(unvisitedDeliveries[i],tour), unvisitedDeliveries[i]));
+			}
+			if (profitValue>max)
+			{
+				//max=profitPerDistanceMatrix[unvisitedPickups[i]][unvisitedDeliveries[j]]/(inputDataProcessor.getDistance(closestPoint(unvisitedPickups[i],tour), unvisitedPickups[i]));
+				max=profitValue;
+			}
+		}
+		
         /*for(int j=0; j< unvisitedPickups.size(); j++)
 		{*/
 		//quantityToTransfer= min(-(inputDataProcessor.basicData[unvisitedDeliveries[i]].quantity), inputDataProcessor.basicData[startNode].quantity);
-		profitsToGet= -(inputDataProcessor.basicData[unvisitedDeliveries[i]].profit); // * quantityToTransfer;
-		travelDistance=inputDataProcessor.getDistance(startNode, unvisitedDeliveries[i]);
-		cumulatedDistances.push_back((cumulatedDistances.back()+(profitsToGet)/(10*travelDistance)));
-		profitsToGet=0;
+		/*
+		 profitsToGet= -(inputDataProcessor.basicData[unvisitedDeliveries[i]].profit); // * quantityToTransfer;
+		travelDistance=inputDataProcessor.getDistance(closestPoint(unvisitedDeliveries[i],tour), unvisitedDeliveries[i]);
+		profitValue=profitsToGet/travelDistance;
+		*/
+		cumulatedDistances.push_back(cumulatedDistances.back()+max);
+		//profitsToGet=0;
     }
    
 	double total=cumulatedDistances.back();
@@ -302,6 +350,7 @@ int TourGreedyEinzelnePunkteSeriell::getNextDeliveryPointRandomised(vector <int>
 			break;
 		}
 	}
+
 
 	return bestToChoose;
 }

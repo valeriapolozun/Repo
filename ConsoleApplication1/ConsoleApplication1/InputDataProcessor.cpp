@@ -39,6 +39,7 @@ vector <int> InputDataProcessor::getQuantities()
 
 vector <int> InputDataProcessor::getTourQuantities(vector <int> tour)
 {
+	tourquantities.clear();
 	for (int i=0; i<tour.size();i++)
 	{
 	tourquantities.push_back(basicData[tour[i]].quantity);

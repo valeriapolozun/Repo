@@ -11,8 +11,7 @@ ProfitCalculator:: ProfitCalculator(std::vector <int> tourInput,std::vector <Coo
 {
 	upperbound = - 1;
 	CPUtime = 0;
-	Iteratations = 0;
-	CPUtimetotal = 0;
+	Iteratations =	CPUtimetotal = 0;
 
 	tour=tourInput;
 	tourLength=tourLengthInput;
