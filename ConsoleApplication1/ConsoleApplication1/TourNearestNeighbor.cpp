@@ -8,7 +8,7 @@ using namespace std;
 TourNearestNeighbor::TourNearestNeighbor(string inputFile): OrienteeringProblemWithPickupsAndDeliveries(inputFile)
 {
 	calcTourNearestNeighbor();
-	profitsOfAllTheTours();
+	profitsOfAllTheTours(1,0);
 }
 
 TourNearestNeighbor::~TourNearestNeighbor()

@@ -19,10 +19,7 @@ TourPickupDeliveryPointPairsParallel::TourPickupDeliveryPointPairsParallel(strin
 	unvisitedNodes[1]=0;
 	calcTourChoosePickupAndDeliveryPointPairs3();
 	
-	
-	
-
-	profitsOfAllTheTours();
+	profitsOfAllTheTours(1,0);
 	/*
 	for (int i=0; i<solutionTours.size();i++)
 	{

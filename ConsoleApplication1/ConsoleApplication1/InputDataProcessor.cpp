@@ -81,7 +81,7 @@ void InputDataProcessor::readData(const string& inputFile)
 	Coordinates c;
 	char line [80];
 
-	ifstream file (inputFile); //open file
+	ifstream file ("C:\\Users\\User\\Documents\\Rfiles\\Instances\\" + inputFile ); //open file
 
 	if (!file)
 	{ 

@@ -15,7 +15,7 @@ TourFirstPickupSecondDelivery::TourFirstPickupSecondDelivery(string inputFile): 
 		calcTourChoosePickupAndDeliveryPointPairs();
 	} 
 
-	profitsOfAllTheTours();
+	profitsOfAllTheTours(1,0);
 }
 
 TourFirstPickupSecondDelivery::~TourFirstPickupSecondDelivery()

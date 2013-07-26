@@ -8,7 +8,7 @@ using namespace std;
 TourDefault::TourDefault(string inputFile): OrienteeringProblemWithPickupsAndDeliveries(inputFile)
 {
 	calcTourDefault();
-	profitsOfAllTheTours();
+	//profitsOfAllTheTours();
 }
 
 TourDefault::~TourDefault()

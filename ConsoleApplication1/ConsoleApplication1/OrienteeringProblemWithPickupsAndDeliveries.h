@@ -7,10 +7,13 @@
 #include "Coordinates.h"
 #include "ProfitCalculator.h"
 #include "ProfitCalculatorOhneGLPK.h"
+#include <time.h>  
 
 class OrienteeringProblemWithPickupsAndDeliveries
 {
 public:
+
+	clock_t clock_start;
 
 	OrienteeringProblemWithPickupsAndDeliveries(std::string inputFile);
 	~OrienteeringProblemWithPickupsAndDeliveries();
@@ -20,7 +23,7 @@ public:
 
 	
 	bool isThereUnvisitedNodes();
-	void profitsOfAllTheTours();
+	void profitsOfAllTheTours(int seedNumber, double timeStart);
 	void profitsOfAllTheToursOhneGLPK();
 	void printSolutions();
 
@@ -36,7 +39,9 @@ public:
 	string filename;
 	std::vector <std::vector <double>> totalFinalSolutions;
 	void runExcelExporter();
-	void runExcelExport(); // csv file
+	void runExcelExport(string inputFile, string heurName); // csv file
+	void runExcelExportStart();
+	void runExcelExportFinish();
 	//string extension;
 	
 	

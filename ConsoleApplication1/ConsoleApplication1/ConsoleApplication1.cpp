@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
 
 	//TourFirstPickupSecondDelivery tfirstpickupseconddelivery("set_64_1_50_300.txt");
 	
-	//TourPickupDeliveryPointPairs pickupdeliverypairs("set_64_1_50_300.txt");
+	
 
 	//TourPickupDeliveryPointPairsParallel pickupdeliverypairsparallel("set_64_1_50_300.txt");
 
@@ -70,11 +70,23 @@ int main(int argc, char **argv) {
 	}
 	*/
 	
-	
-	TourGreedyEinzelnePunkteSeriell tourgreedyeinzeln("set_64_1_50_300.txt");
-	tourgreedyeinzeln.runExcelExport();
-	tourgreedyeinzeln.runTwoOpt();
-	tourgreedyeinzeln.runExcelExport();
+	OrienteeringProblemWithPickupsAndDeliveries proba ("set_64_1_50_300.txt");
+	proba.runExcelExportStart();
+	for (int i=15; i<16; i+=5)
+	{
+		//TourGreedyEinzelnePunkteSeriell tourgreedyeinzeln("set_64_1_" + std::to_string(i) + "_300.txt", 1);
+		//TourGreedyEinzelnePunkteSeriell tourgreedyeinzeln2("set_64_1_" + std::to_string(i) + "_300.txt", 3);
+		//TourGreedyEinzelnePunkteSeriell tourgreedyeinzeln3("set_64_1_" + std::to_string(i) + "_300.txt", 15);
+		//TourGreedyEinzelnePunkteSeriell tourgreedyeinzeln4("set_64_1_" + std::to_string(i) + "_300.txt", 20);
+		//TourPickupDeliveryPointPairs pickupdeliverypairs("set_64_1_" + std::to_string(i) + "_300.txt", 1);
+		TourPickupDeliveryPointPairs pickupdeliverypairs2("set_64_1_" + std::to_string(i) + "_300.txt", 3);
+		TourPickupDeliveryPointPairs pickupdeliverypairs3("set_64_1_" + std::to_string(i) + "_300.txt", 15);
+		TourPickupDeliveryPointPairs pickupdeliverypairs4("set_64_1_" + std::to_string(i) + "_300.txt", 20);
+	}
+	proba.runExcelExportFinish();
+
+	//tourgreedyeinzeln.runTwoOpt();
+	//tourgreedyeinzeln.runExcelExport();
 
 	/*
 	tourgreedyeinzeln.erasePoints(1, 0.1);

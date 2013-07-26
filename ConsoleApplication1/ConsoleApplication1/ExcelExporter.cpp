@@ -219,9 +219,35 @@ ExcelExporter::ExcelExporter(vector <std::vector <double>> totalFinalSolutions)
    // Uninitialize COM for this thread...
    CoUninitialize();
 
-
-
-
 }
+
+void ExcelExporter::runExcelExporting(vector <std::vector <double>> totalFinalSolutions)
+{
+	ofstream MyExcelFile;
+	MyExcelFile.open("C:\\Users\\User\\Documents\\Rfiles\\example.csv");
+
+	int rowCount=totalFinalSolutions.size();
+	int colCount=totalFinalSolutions[0].size();
+
+	for(int i=0; i< 3; i++)
+	{ 
+	MyExcelFile << "Profit T"<< i+1 << ";";
+	MyExcelFile << "Tourlength T" << i+1 << ";";
+	}
+
+	MyExcelFile << "Total Profit" << ";";
+	MyExcelFile << "Run time" << ";" << endl;
+
+	 for(int i=0; i<rowCount; i++)
+	 { 
+		for(int j=0; j<colCount; j++) 
+		{ 
+			MyExcelFile << "=\"" << totalFinalSolutions[i][j] << "\"" << ";";
+		}	
+		MyExcelFile	<< endl;
+	 }
+	MyExcelFile.close();
+
+};
 
 

@@ -15,7 +15,7 @@ TourNearestNeighborDistanceLimit::TourNearestNeighborDistanceLimit(string inputF
 		calcTourNearestNeighborDistanceLimit();
 	} 
 
-	profitsOfAllTheTours();
+	profitsOfAllTheTours(1,0);
 }
 
 TourNearestNeighborDistanceLimit::~TourNearestNeighborDistanceLimit()

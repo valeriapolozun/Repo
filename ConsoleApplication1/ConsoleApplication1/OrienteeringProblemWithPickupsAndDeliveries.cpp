@@ -18,12 +18,13 @@
 
 using namespace std;
 
-static clock_t clock_start;
+//static clock_t clock_start;
 static clock_t clockStartThisSolution;
 
 
 OrienteeringProblemWithPickupsAndDeliveries::OrienteeringProblemWithPickupsAndDeliveries(string inputFile)
 {
+
 	countSolutionRuns=0;
 	clock_start=clock();
 	inputDataProcessor.init(inputFile);
@@ -148,7 +149,7 @@ void OrienteeringProblemWithPickupsAndDeliveries::getProfitMatrixForPickupAndDel
 
 	for (int i = 0; i < problemSize; i++)
 	{
-		for(int j = i+1; j < problemSize; j++)
+		for(int j = 0; j < problemSize; j++)
 		{
 			if(basicData[i].quantity*basicData[j].quantity >= 0 || basicData[i].quantity<=0 || unvisitedNodes[i]==0)   
 			{
@@ -203,7 +204,7 @@ void OrienteeringProblemWithPickupsAndDeliveries::getProfitMatrixForPickupAndDel
 	double travelDistance; // stores the calculated distances
 	double profitValueMax; // profit value per unit which can be reached by visiting a certain pair of Pick up and Delivery point
 	vector<Coordinates> basicData(inputDataProcessor.getBasicData());
-	double travelCostFactor;
+	//double travelCostFactor;
 
 	for (int i = 0; i < problemSize; i++)
 	{
@@ -215,7 +216,7 @@ void OrienteeringProblemWithPickupsAndDeliveries::getProfitMatrixForPickupAndDel
 			}
 			else
 			{
-			travelCostFactor=inputDataProcessor.getDistance(0,i)+inputDataProcessor.getDistance(0,j)+inputDataProcessor.getDistance(i,1)+inputDataProcessor.getDistance(j,1);
+			//travelCostFactor=inputDataProcessor.getDistance(0,i)+inputDataProcessor.getDistance(0,j)+inputDataProcessor.getDistance(i,1)+inputDataProcessor.getDistance(j,1);
 			profitPerDistanceMatrix[i][j]= (basicData[i].profit-basicData[j].profit)* min(basicData[i].quantity,-(basicData[j].quantity));
 			}
 		}
@@ -449,29 +450,34 @@ void OrienteeringProblemWithPickupsAndDeliveries::profitsOfAllTheToursOhneGLPK()
 }
 
 
-void OrienteeringProblemWithPickupsAndDeliveries::profitsOfAllTheTours()
+void OrienteeringProblemWithPickupsAndDeliveries::profitsOfAllTheTours(int seedNumber, double timeStart)
 {
 	double result=0;
 	double time=0;
-	finalSolutions.clear();
 	for (int i=0 ; i< solutionTours.size();i++)
 	{
-
+		finalSolutions.push_back(seedNumber);
 		ProfitCalculator initialToursProfit( solutionTours[i], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity(), getTourLength(solutionTours[i]), clock_start, clockStartThisSolution); 
-		finalSolutions.push_back( initialToursProfit.getProfit());
-		finalSolutions.push_back (getTourLength(solutionTours[i]));
+		finalSolutions.push_back(i+1); // Tour
+		finalSolutions.push_back( initialToursProfit.getProfit()); // Profit
+		finalSolutions.push_back (getTourLength(solutionTours[i])); // Tourlength
 		vector <double> intensityToInsert=  initialToursProfit.getIntensity();
 		intensity.push_back(intensityToInsert);
 		
 		cout << "Profit of the " << i+1 << ". tour: " << initialToursProfit.getProfit() << endl;
-		Rprintsol(rexe, rpath, filename, initialToursProfit, i, countSolutionRuns);
+		//Rprintsol(rexe, rpath, filename, initialToursProfit, i, countSolutionRuns);
 		result= result+ initialToursProfit.getProfit();
-		time=initialToursProfit.time_c;
-	}
-	finalSolutions.push_back(result);
-	finalSolutions.push_back(time);
+		//time=initialToursProfit.time_c- timeStart;
+		time=(clock()-timeStart)/CLOCKS_PER_SEC;
+		finalSolutions.push_back(time);
+		totalFinalSolutions.push_back(finalSolutions);
+		finalSolutions.clear();
 
-	totalFinalSolutions.push_back(finalSolutions);
+	}
+	//finalSolutions.push_back(result);
+	//finalSolutions.push_back(time);
+
+	//totalFinalSolutions.push_back(finalSolutions);
 
 	cout << "The total profit of the tours all together :  " << result << endl;
 	cout << "The tours:    "<< endl;
@@ -499,7 +505,7 @@ void OrienteeringProblemWithPickupsAndDeliveries::runTwoOpt()
 		doTwoOpt(i);
 	}
 	profitsOfAllTheToursOhneGLPK();
-	profitsOfAllTheTours();
+	profitsOfAllTheTours(2, 0);
 }
 
 
@@ -898,7 +904,7 @@ void OrienteeringProblemWithPickupsAndDeliveries::insertPoints(vector <Coordinat
 		cout<<endl;
 	}
 
-	profitsOfAllTheTours();
+	//profitsOfAllTheTours();
 
 }
 
@@ -1254,31 +1260,64 @@ ExcelExporter excelExporter(totalFinalSolutions);
 };
 
 
-void OrienteeringProblemWithPickupsAndDeliveries::runExcelExport()
+void OrienteeringProblemWithPickupsAndDeliveries::runExcelExportStart()
 {
 	ofstream MyExcelFile;
-	MyExcelFile.open("C:\\Users\\User\\Documents\\Rfiles\\example.csv");
+	MyExcelFile.open("C:\\Users\\User\\Documents\\Rfiles\\example.csv", ios::out);
+	MyExcelFile << "Instance"<< ";";
+	MyExcelFile << "Seed" << ";";
+	MyExcelFile << "Tour" << ";";
+
+	//for(int i=0; i<numberOfTours; i++)
+	//{ 
+	MyExcelFile << "Profit"<< ";";
+	MyExcelFile << "Tourlength" << ";";
+	//}
+
+	//MyExcelFile << "Total Profit" << ";";
+	MyExcelFile << "Run time" << ";";
+	MyExcelFile << "Method" << ";" << endl;
+}
+
+void OrienteeringProblemWithPickupsAndDeliveries::runExcelExportFinish()
+{
+	ofstream MyExcelFile;
+	MyExcelFile.close();
+}
+
+void OrienteeringProblemWithPickupsAndDeliveries::runExcelExport(string inputFile, string heurName)
+{
+	
+	ofstream MyExcelFile;
+	MyExcelFile.open("C:\\Users\\User\\Documents\\Rfiles\\example.csv", ios::out | ios::app);
 
 	int rowCount=totalFinalSolutions.size();
 	int colCount=totalFinalSolutions[0].size();
+	/*
+	MyExcelFile << "Instance"<< ";";
+	MyExcelFile << "Seed" << ";";
+	MyExcelFile << "Tour" << ";";
 
-	for(int i=0; i<numberOfTours; i++)
-	{ 
-	MyExcelFile << "Profit T"<< i+1 << ";";
-	MyExcelFile << "Tourlength T" << i+1 << ";";
-	}
+	//for(int i=0; i<numberOfTours; i++)
+	//{ 
+	MyExcelFile << "Profit"<< ";";
+	MyExcelFile << "Tourlength" << ";";
+	//}
 
-	MyExcelFile << "Total Profit" << ";";
+	//MyExcelFile << "Total Profit" << ";";
 	MyExcelFile << "Run time" << ";" << endl;
-
+	*/
 	 for(int i=0; i<rowCount; i++)
 	 { 
+		MyExcelFile << "=\"" << inputFile << "\"" << ";";
+		//MyExcelFile << "=\"" << seedNumber << "\"" << ";";
 		for(int j=0; j<colCount; j++) 
 		{ 
 			MyExcelFile << "=\"" << totalFinalSolutions[i][j] << "\"" << ";";
-		}	
+		}
+		MyExcelFile << "=\"" << heurName << "\"" << ";";
 		MyExcelFile	<< endl;
 	 }
-	MyExcelFile.close();
+	//MyExcelFile.close();
 
 };

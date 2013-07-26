@@ -1,4 +1,5 @@
 #include "TourGreedyEinzelnePunkteSeriell.h"
+#include "OrienteeringProblemWithPickupsAndDeliveries.h"
 #include "InputDataProcessor.h"
 #include "LoadCalculator.h"
 #include <iostream>
@@ -6,29 +7,42 @@
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
 #include <algorithm>
+#include <fstream>
 
 
 using namespace std;
 
+typedef std::pair <double, int> mypair;
+bool comparator (const mypair& l, const mypair& r )
+{ return l.first> r.first;}
 
-TourGreedyEinzelnePunkteSeriell::TourGreedyEinzelnePunkteSeriell(string inputFile): OrienteeringProblemWithPickupsAndDeliveries(inputFile)
+
+TourGreedyEinzelnePunkteSeriell::TourGreedyEinzelnePunkteSeriell(string inputFile, int selectionPop): OrienteeringProblemWithPickupsAndDeliveries(inputFile)
 {
-	unvisitedNodes.assign(problemSize,1);
-	unvisitedNodes[0]=0;
-	unvisitedNodes[1]=0;
-	srand(time(NULL));
-	deliveryPointInserted=false;
 
-	for (int i=0; i<numberOfTours;i++)
+	
+	for (int seedNumber=0; seedNumber<10; seedNumber++) // 100 seed run
 	{
-		calcTourChoosePickupAndDeliveryPointPairs(i);
-	} 
-
-	profitsOfAllTheTours();
+	//int seedNumber=44;
+		solutionTours.clear();
+		unvisitedNodes.assign(problemSize,1);
+		unvisitedNodes[0]=0;
+		unvisitedNodes[1]=0;
+		srand(seedNumber);
+		deliveryPointInserted=false;
+		double timeStart=clock();
+		//double timeStart=0;
+		for (int i=0; i<numberOfTours;i++)
+		{
+			calcTourChoosePickupAndDeliveryPointPairs(i, selectionPop);
+		} 
+		profitsOfAllTheTours(seedNumber, timeStart);
 		for (int i=0; i<solutionTours.size();i++)
-	{
-		cout << "The tour length of the " << i+1 << ". tour is: " << getTourLength(solutionTours[i]) << endl;
-	} 
+		{
+			cout << "The tour length of the " << i+1 << ". tour is: " << getTourLength(solutionTours[i]) << endl;
+		} 
+	}
+	runExcelExport(inputFile, "heurSeriell" + std::to_string(selectionPop));
 
 }
 
@@ -39,7 +53,7 @@ TourGreedyEinzelnePunkteSeriell::~TourGreedyEinzelnePunkteSeriell()
 
 
 
-void TourGreedyEinzelnePunkteSeriell::calcTourChoosePickupAndDeliveryPointPairs(int whichTour){
+void TourGreedyEinzelnePunkteSeriell::calcTourChoosePickupAndDeliveryPointPairs(int whichTour, int selectionPop){
 	//vector<int> unvisitedNodesForOneTour;
 
 	unvisitedNodesForOneTour= unvisitedNodes;
@@ -58,61 +72,111 @@ void TourGreedyEinzelnePunkteSeriell::calcTourChoosePickupAndDeliveryPointPairs(
 
 	for (int i = 0; i < maxRun; i++)
 	{
-		//startNode=getNextPickupPoint( pickupPoints, deliveryPoints, startNode);
-		startNode=getNextPickupPointRandomised( pickupPoints, deliveryPoints, *(solutionTours[whichTour].end()-2), solutionTours[whichTour]);
 
-		putPointInBestPosition( whichTour, startNode);
-
-		unvisitedNodesForOneTour[startNode]=0;
-
-		if (startNode==1)
+		pickupPointInserted=false;
+		while (pickupPointInserted!=true && pickupPoints.size()!=0)//(std::find(unvisitedNodesForOneTour.begin(), unvisitedNodesForOneTour.end(), 1)!=unvisitedNodesForOneTour.end()))
 		{
-		cout << "error";
-		}
-
-		/*
-		if (isTotalLengthUnderLimit(tour, startNode))
-		{
-			tour.push_back(startNode);
-		}
-		*/
-		//pickupPoints.erase(pickupPoints.begin() + startNode);
-
-		for (int j = 0; j < pickupPoints.size(); j++)
-		{
-			if (pickupPoints[j]==startNode)
+			startNode=0;
+			if (selectionPop==1)
 			{
-				pickupPoints.erase(pickupPoints.begin()+j);
+			startNode=getNextPickupPoint(pickupPoints, deliveryPoints, startNode, solutionTours[whichTour]);
 			}
+			else
+			{
+				if (selectionPop==3 || selectionPop==15)
+				{
+				startNode=getNextPickupPointRandomisedBest15(pickupPoints, deliveryPoints, lastPickupInserted, solutionTours[whichTour], selectionPop);
+				}
+				else
+				{
+				startNode=getNextPickupPointRandomised(pickupPoints, deliveryPoints, lastPickupInserted, solutionTours[whichTour]);
+				}
+			}
+
+			/*
+			//startNode=getNextPickupPoint( pickupPoints, deliveryPoints, startNode, solutionTours[whichTour]);
+			//startNode=getNextPickupPointRandomised( pickupPoints, deliveryPoints, *(solutionTours[whichTour].end()-2), solutionTours[whichTour]);
+			startNode=getNextPickupPointRandomisedBest15(pickupPoints, deliveryPoints, *(solutionTours[whichTour].end()-2), solutionTours[whichTour], 15);
+			*/
+
+			if (startNode!=0)
+			{
+				putPointInBestPosition( whichTour, startNode);
+
+				unvisitedNodesForOneTour[startNode]=0;
+
+				if (startNode==1 || startNode==0)
+				{
+				cout << "error";
+				}
+
+				/*
+				if (isTotalLengthUnderLimit(tour, startNode))
+				{
+					tour.push_back(startNode);
+				}
+				*/
+				//pickupPoints.erase(pickupPoints.begin() + startNode);
+
+				for (int j = 0; j < pickupPoints.size(); j++)
+				{
+					if (pickupPoints[j]==startNode)
+					{
+						pickupPoints.erase(pickupPoints.begin()+j);
+					}
+				}
+			}
+			else
+			{
+				pickupPoints.clear();
+			}
+		
 		}
 
 		deliveryPointInserted=false;
 		while (deliveryPointInserted!=true && deliveryPoints.size()!=0)//(std::find(unvisitedNodesForOneTour.begin(), unvisitedNodesForOneTour.end(), 1)!=unvisitedNodesForOneTour.end()))
 		{
+			startNode=0;
 
-			//startNode=getNextDeliveryPoint(pickupPoints, deliveryPoints, startNode);
-			startNode=getNextDeliveryPointRandomised(pickupPoints, deliveryPoints, lastPickupInserted, solutionTours[whichTour]);
+
+			if (selectionPop==1)
+			{
+			startNode=getNextDeliveryPoint(pickupPoints, deliveryPoints, startNode, solutionTours[whichTour]);
+			}
+			else
+			{
+				if (selectionPop==3 || selectionPop==15)
+				{
+				startNode=getNextDeliveryPointRandomisedBest15(pickupPoints, deliveryPoints, lastPickupInserted, solutionTours[whichTour], selectionPop);
+				}
+				else
+				{
+				startNode=getNextDeliveryPointRandomised(pickupPoints, deliveryPoints, lastPickupInserted, solutionTours[whichTour]);
+				}
+			}
+
 
 			//putPointInBestPosition( whichTour, startNode);
 
-			if (startNode==1)
+			if (startNode==1 || startNode==0)
 			{
 			cout << "error";
 			}
 
-
-			putDeliveryPointInBestPosition(whichTour, startNode, pickupInsertedPosition);
-			unvisitedNodesForOneTour[startNode]=0;
-
-			for (int j = 0; j < deliveryPoints.size(); j++)
+			if (startNode!=0)
 			{
-				if (startNode== deliveryPoints[j])
+				putDeliveryPointInBestPosition(whichTour, startNode, pickupInsertedPosition);
+				unvisitedNodesForOneTour[startNode]=0;
+
+				for (int j = 0; j < deliveryPoints.size(); j++)
 				{
-					deliveryPoints.erase(deliveryPoints.begin() + j);
+					if (startNode== deliveryPoints[j])
+					{
+						deliveryPoints.erase(deliveryPoints.begin() + j);
+					}
 				}
 			}
-
-			if (startNode==0) // no more delivery can be inserted!
+			else // no more delivery can be inserted!
 			{
 			deliveryPoints.clear();
 			}
@@ -160,6 +224,7 @@ void TourGreedyEinzelnePunkteSeriell::calcTourChoosePickupAndDeliveryPointPairs(
 
 void TourGreedyEinzelnePunkteSeriell::pickupPoint (std::vector<int> & nodes)
 {
+	pickupPoints.clear();
 	for (int i=0; i<nodes.size();i++)
 	{
 		if (nodes[i]==1)
@@ -175,6 +240,7 @@ void TourGreedyEinzelnePunkteSeriell::pickupPoint (std::vector<int> & nodes)
 
 void TourGreedyEinzelnePunkteSeriell::deliveryPoint (std::vector<int> & nodes)
 {
+	deliveryPoints.clear();
 	for (int i=0; i<nodes.size();i++)
 	{
 		if (nodes[i]==1)
@@ -188,11 +254,34 @@ void TourGreedyEinzelnePunkteSeriell::deliveryPoint (std::vector<int> & nodes)
 }
 
 
-int TourGreedyEinzelnePunkteSeriell::getNextPickupPoint(vector <int> unvisitedPickups, vector <int> unvisitedDeliveries, int startNode)
+int TourGreedyEinzelnePunkteSeriell::getNextPickupPoint(vector <int> unvisitedPickups, vector <int> unvisitedDeliveries, int startNode, vector <int> tour)
 {
     double min = DBL_MAX;
     int bestToChoose = startNode;
 	double distancesToDeliveryPoints=0;
+	double max=0;
+	double profitValue;
+
+	for(int i=0; i< unvisitedPickups.size(); i++)
+	{
+		
+        for(int j=0; j< unvisitedDeliveries.size(); j++)
+		{
+			//if (inputDataProcessor.getDistance(closestPoint(unvisitedDeliveries[j],tour), unvisitedDeliveries[j])< inputDataProcessor.getDistance(closestPoint(unvisitedPickups[i],tour), unvisitedPickups[i]))
+			//{
+			profitValue=profitPerDistanceMatrix[unvisitedPickups[i]][unvisitedDeliveries[j]] / (inputDataProcessor.getDistance(closestPoint(unvisitedPickups[i],tour), unvisitedPickups[i]));
+			//}
+			if (profitValue>max)
+			{
+				//max=profitPerDistanceMatrix[unvisitedPickups[i]][unvisitedDeliveries[j]]/(inputDataProcessor.getDistance(closestPoint(unvisitedPickups[i],tour), unvisitedPickups[i]));
+				max=profitValue;
+				bestToChoose=unvisitedPickups[i];
+			}
+		}
+	}
+	return bestToChoose;
+
+	/* old code
     for(int i=0; i< unvisitedPickups.size(); i++)
     {
          for(int j=0; j< unvisitedDeliveries.size(); j++)
@@ -207,13 +296,14 @@ int TourGreedyEinzelnePunkteSeriell::getNextPickupPoint(vector <int> unvisitedPi
 	distancesToDeliveryPoints=0;
     }
     return bestToChoose;
+	old code end */
 
 }
 
 int TourGreedyEinzelnePunkteSeriell::getNextPickupPointRandomised(vector <int> unvisitedPickups, vector <int> unvisitedDeliveries, int startNode, vector <int> tour)
 {
     double min = DBL_MAX;
-    int bestToChoose = startNode;
+    int bestToChoose = 0;
 	double profitsWithOtherDeliveryPoints=0;
 	double profitValue=0;
 	vector <double> cumulatedProfits;
@@ -225,10 +315,10 @@ int TourGreedyEinzelnePunkteSeriell::getNextPickupPointRandomised(vector <int> u
 		max=0;
         for(int j=0; j< unvisitedDeliveries.size(); j++)
 		{
-			if (inputDataProcessor.getDistance(closestPoint(unvisitedDeliveries[j],tour), unvisitedDeliveries[j])< inputDataProcessor.getDistance(closestPoint(unvisitedPickups[i],tour), unvisitedPickups[i]))
-			{
-				profitValue=profitPerDistanceMatrix[unvisitedPickups[i]][unvisitedDeliveries[j]] / (inputDataProcessor.getDistance(closestPoint(unvisitedPickups[i],tour), unvisitedPickups[i]));
-			}
+			//if (inputDataProcessor.getDistance(closestPoint(unvisitedDeliveries[j],tour), unvisitedDeliveries[j])< inputDataProcessor.getDistance(closestPoint(unvisitedPickups[i],tour), unvisitedPickups[i]))
+			//{
+			profitValue=profitPerDistanceMatrix[unvisitedPickups[i]][unvisitedDeliveries[j]] / (inputDataProcessor.getDistance(closestPoint(unvisitedPickups[i],tour), unvisitedPickups[i]));
+			//}
 			if (profitValue>max)
 			{
 				//max=profitPerDistanceMatrix[unvisitedPickups[i]][unvisitedDeliveries[j]]/(inputDataProcessor.getDistance(closestPoint(unvisitedPickups[i],tour), unvisitedPickups[i]));
@@ -279,11 +369,96 @@ int TourGreedyEinzelnePunkteSeriell::getNextPickupPointRandomised(vector <int> u
 	return bestToChoose;
 }
 
-int TourGreedyEinzelnePunkteSeriell::getNextDeliveryPoint(vector <int> unvisitedPickups, vector <int> unvisitedDeliveries, int startNode)
+
+int TourGreedyEinzelnePunkteSeriell::getNextPickupPointRandomisedBest15(vector <int> unvisitedPickups, vector <int> unvisitedDeliveries, int startNode, vector <int> tour, int selectionPop)
+{
+    double min = DBL_MAX;
+    int bestToChoose = 0;
+	double profitsWithOtherDeliveryPoints=0;
+	double profitValue=0;
+	mypair best15;
+	vector <mypair> best15Pairs;
+	double randNumber;
+	double max;
+    for(int i=0; i< unvisitedPickups.size(); i++)
+    {
+		max=0;
+        for(int j=0; j< unvisitedDeliveries.size(); j++)
+		{
+			//if (inputDataProcessor.getDistance(closestPoint(unvisitedDeliveries[j],tour), unvisitedDeliveries[j])< inputDataProcessor.getDistance(closestPoint(unvisitedPickups[i],tour), unvisitedPickups[i]))
+			//{
+			profitValue=profitPerDistanceMatrix[unvisitedPickups[i]][unvisitedDeliveries[j]] / (inputDataProcessor.getDistance(closestPoint(unvisitedPickups[i],tour), unvisitedPickups[i]));
+			//}
+			if (profitValue>max)
+			{
+				//max=profitPerDistanceMatrix[unvisitedPickups[i]][unvisitedDeliveries[j]]/(inputDataProcessor.getDistance(closestPoint(unvisitedPickups[i],tour), unvisitedPickups[i]));
+				max=profitValue;
+			}
+
+		}
+		
+		best15Pairs.push_back(std::make_pair( max, i));
+	}
+	std::sort(best15Pairs.begin(), best15Pairs.end(), comparator);
+	for(int k=1; k<best15Pairs.size(); k++)
+	{
+		best15Pairs[k].first=best15Pairs[k-1].first+best15Pairs[k].first;
+	}
+
+	if (best15Pairs.size()>selectionPop)
+	{
+	best15Pairs.erase(best15Pairs.begin()+selectionPop, best15Pairs.end());
+	}
+	best15Pairs.insert(best15Pairs.begin(),std::make_pair(0,0));
+   
+	double total=best15Pairs.back().first;
+	randNumber= (double) rand() / (double) (RAND_MAX + 1)* total  ;
+	for(int k=1; k<best15Pairs.size(); k++)
+	{
+		if (randNumber<=best15Pairs[k].first && randNumber>best15Pairs[k-1].first)
+		{
+			bestToChoose = unvisitedPickups[best15Pairs[k-1].second];
+			break;
+		}
+	}
+
+	return bestToChoose;
+}
+
+
+
+
+
+int TourGreedyEinzelnePunkteSeriell::getNextDeliveryPoint(vector <int> unvisitedPickups, vector <int> unvisitedDeliveries, int startNode, vector <int> tour)
 {
     double min = DBL_MAX;
     int bestToChoose = startNode;
 	double distancesToPickupPoints=0;
+	double max=0;
+	double profitValue=0;
+
+	for(int i=0; i< unvisitedDeliveries.size(); i++)
+    {
+		for(int j=0; j< unvisitedPickups.size(); j++)
+		{
+			//if (inputDataProcessor.getDistance(closestPoint(unvisitedPickups[j],tour), unvisitedPickups[j])< inputDataProcessor.getDistance(closestPoint(unvisitedDeliveries[i],tour), unvisitedDeliveries[i]))
+			//{
+			profitValue=profitPerDistanceMatrix[unvisitedPickups[j]][unvisitedDeliveries[i]] / (inputDataProcessor.getDistance(closestPoint(unvisitedDeliveries[i],tour), unvisitedDeliveries[i]));
+			//}
+			if (profitValue>max)
+			{
+				//max=profitPerDistanceMatrix[unvisitedPickups[i]][unvisitedDeliveries[j]]/(inputDataProcessor.getDistance(closestPoint(unvisitedPickups[i],tour), unvisitedPickups[i]));
+				max=profitValue;
+				bestToChoose=unvisitedDeliveries[i];
+			}
+		}
+		
+	}
+	return bestToChoose;
+
+
+
+	/*old code
     for(int i=0; i< unvisitedDeliveries.size(); i++)
     {
          for(int j=0; j< unvisitedPickups.size(); j++)
@@ -298,6 +473,7 @@ int TourGreedyEinzelnePunkteSeriell::getNextDeliveryPoint(vector <int> unvisited
 	distancesToPickupPoints=0;
     }
     return bestToChoose;
+	*/
 }
 
 int TourGreedyEinzelnePunkteSeriell::getNextDeliveryPointRandomised(vector <int> unvisitedPickups, vector <int> unvisitedDeliveries, int startNode,vector <int> tour)
@@ -317,10 +493,10 @@ int TourGreedyEinzelnePunkteSeriell::getNextDeliveryPointRandomised(vector <int>
 		max=0;
 		 for(int j=0; j< unvisitedPickups.size(); j++)
 		{
-			if (inputDataProcessor.getDistance(closestPoint(unvisitedPickups[j],tour), unvisitedPickups[j])< inputDataProcessor.getDistance(closestPoint(unvisitedDeliveries[i],tour), unvisitedDeliveries[i]))
-			{
-				profitValue=profitPerDistanceMatrix[unvisitedPickups[j]][unvisitedDeliveries[i]] / (inputDataProcessor.getDistance(closestPoint(unvisitedDeliveries[i],tour), unvisitedDeliveries[i]));
-			}
+			//if (inputDataProcessor.getDistance(closestPoint(unvisitedPickups[j],tour), unvisitedPickups[j])< inputDataProcessor.getDistance(closestPoint(unvisitedDeliveries[i],tour), unvisitedDeliveries[i]))
+			//{
+			profitValue=profitPerDistanceMatrix[unvisitedPickups[j]][unvisitedDeliveries[i]] / (inputDataProcessor.getDistance(closestPoint(unvisitedDeliveries[i],tour), unvisitedDeliveries[i]));
+			//}
 			if (profitValue>max)
 			{
 				//max=profitPerDistanceMatrix[unvisitedPickups[i]][unvisitedDeliveries[j]]/(inputDataProcessor.getDistance(closestPoint(unvisitedPickups[i],tour), unvisitedPickups[i]));
@@ -355,6 +531,61 @@ int TourGreedyEinzelnePunkteSeriell::getNextDeliveryPointRandomised(vector <int>
 	return bestToChoose;
 }
 
+int TourGreedyEinzelnePunkteSeriell::getNextDeliveryPointRandomisedBest15(vector <int> unvisitedPickups, vector <int> unvisitedDeliveries, int startNode, vector <int> tour, int selectionPop)
+{
+    double min = DBL_MAX;
+    int bestToChoose = 0;
+	double profitsWithOtherDeliveryPoints=0;
+	double profitValue=0;
+	mypair best15;
+	vector <mypair> best15Pairs;
+	double randNumber;
+	double max;
+
+	  for(int i=0; i< unvisitedDeliveries.size(); i++)
+    {
+		max=0;
+		 for(int j=0; j< unvisitedPickups.size(); j++)
+		{
+			//if (inputDataProcessor.getDistance(closestPoint(unvisitedPickups[j],tour), unvisitedPickups[j])< inputDataProcessor.getDistance(closestPoint(unvisitedDeliveries[i],tour), unvisitedDeliveries[i]))
+			//{
+			profitValue=profitPerDistanceMatrix[unvisitedPickups[j]][unvisitedDeliveries[i]] / (inputDataProcessor.getDistance(closestPoint(unvisitedDeliveries[i],tour), unvisitedDeliveries[i]));
+			//}
+			if (profitValue>max)
+			{
+				//max=profitPerDistanceMatrix[unvisitedPickups[i]][unvisitedDeliveries[j]]/(inputDataProcessor.getDistance(closestPoint(unvisitedPickups[i],tour), unvisitedPickups[i]));
+				max=profitValue;
+			}
+		}
+
+		best15Pairs.push_back(std::make_pair( max, i));
+	}
+	std::sort(best15Pairs.begin(), best15Pairs.end(), comparator);
+	for(int k=1; k<best15Pairs.size(); k++)
+	{
+		best15Pairs[k].first=best15Pairs[k-1].first+best15Pairs[k].first;
+	}
+	if (best15Pairs.size()>selectionPop)
+	{
+	best15Pairs.erase(best15Pairs.begin()+selectionPop, best15Pairs.end());
+	}
+
+	best15Pairs.insert(best15Pairs.begin(),std::make_pair(0,0));
+	
+   
+	double total=best15Pairs.back().first;
+	randNumber= (double) rand() / (double) (RAND_MAX + 1)* total  ;
+	for(int k=1; k<best15Pairs.size(); k++)
+	{
+		if (randNumber<=best15Pairs[k].first && randNumber>best15Pairs[k-1].first)
+		{
+			bestToChoose = unvisitedDeliveries[best15Pairs[k-1].second];
+			break;
+		}
+	}
+
+	return bestToChoose;
+}
 
 
 
@@ -390,11 +621,16 @@ void TourGreedyEinzelnePunkteSeriell::putPointInBestPosition(int whichTour, int 
 	if (minTourLengthExtension!=DBL_MAX)
 	{
 		solutionTours[whichTour].insert(solutionTours[whichTour].begin()+posToInsert, pointToInsert);
+		pickupPointInserted=true;
 		lastPickupInserted=pointToInsert;
 		pickupInsertedPosition=posToInsert;
 		//intensity[whichTour].insert(intensity[whichTour].begin()+posToInsert, 1);
 		//LoadCalculator newLoad( load[whichTour], goodsOnTheLorry[whichTour], bufferPlus[whichTour], bufferMinus[whichTour], intensity[whichTour]);
 		unvisitedNodes[pointToInsert]=0;
+	}
+	else
+	{
+		pickupInsertedPosition=false;
 	}
 						
 	//unvisitedNodesForOneTour[pointToInsert]=0;
@@ -424,10 +660,12 @@ void TourGreedyEinzelnePunkteSeriell::putDeliveryPointInBestPosition(int whichTo
 			}
 		}
 	}
+
 	else
 	{
 	solutionTours[whichTour].insert(solutionTours[whichTour].begin()+1, pointToInsert);
 	}
+	
 	
 	if (minTourLengthExtension!=DBL_MAX)
 	{

@@ -5,28 +5,41 @@
 #include <stdio.h>      /* printf, NULL */
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
-
+#include <algorithm> 
 
 using namespace std;
 
+typedef std::pair <double, vector <int>> mypair2;
+bool comparator (const mypair2& l, const mypair2& r )
+{ return l.first> r.first;}
 
-TourPickupDeliveryPointPairs::TourPickupDeliveryPointPairs(string inputFile): OrienteeringProblemWithPickupsAndDeliveries(inputFile)
+TourPickupDeliveryPointPairs::TourPickupDeliveryPointPairs(string inputFile, int selectionPop): OrienteeringProblemWithPickupsAndDeliveries(inputFile)
 {
+	for (int seedNumber=0; seedNumber<10; seedNumber++) // 100 seed run
+	{
+	//int seedNumber=44;
+	solutionTours.clear();
+
+
 	bestPairs.assign(2,0);
 	unvisitedNodes.assign(problemSize,1);
 	unvisitedNodes[0]=0;
 	unvisitedNodes[1]=0;
+	srand(seedNumber);
+	double timeStart=clock();
 	for (int i=0; i<numberOfTours;i++)
 	{
-		calcTourChoosePickupAndDeliveryPointPairs2(i);
+		calcTourChoosePickupAndDeliveryPointPairs2(i, selectionPop);
 	} 
 
-	profitsOfAllTheTours();
+	profitsOfAllTheTours(seedNumber,timeStart);
 	for (int i=0; i<solutionTours.size();i++)
 	{
 		cout << "The tour length of the " << i+1 << ". tour is: " << getTourLength(solutionTours[i]) << endl;
-	} 
+	}
+	}
 
+	runExcelExport(inputFile, "heurSeriellPairs" + std::to_string(selectionPop));
 
 
 }
@@ -47,7 +60,7 @@ void TourPickupDeliveryPointPairs::pickUpPointToChoose(vector<int> & nodes)
 
 
 
-void TourPickupDeliveryPointPairs::calcTourChoosePickupAndDeliveryPointPairs2(int whichTour){
+void TourPickupDeliveryPointPairs::calcTourChoosePickupAndDeliveryPointPairs2(int whichTour, int selectionPop){
 	vector<int> unvisitedNodesForOneTour;
 
 	unvisitedNodesForOneTour= unvisitedNodes;
@@ -67,9 +80,25 @@ void TourPickupDeliveryPointPairs::calcTourChoosePickupAndDeliveryPointPairs2(in
 	//for (int i = 0; i < (problemSize-2); i++)  /// TO DO : Calculate how many times it should run (problemSize-2) is wrong
 	while (criterion)
 	{
-		//getPickUpDeliveryPointPairsTwoPointsAdded(unvisitedNodesForOneTour, tour.back(), bestPairs, whichTour);
-		getPickUpDeliveryPointPairsTwoPointsAddedRandomised(unvisitedNodesForOneTour, tour.back(), bestPairs, whichTour);
-
+			if (selectionPop==1)
+			{
+			getPickUpDeliveryPointPairsTwoPointsAdded(unvisitedNodesForOneTour, tour.back(), bestPairs, whichTour);
+			}
+			else
+			{
+				if (selectionPop==3 || selectionPop==15)
+				{
+				getPickUpDeliveryPointPairsTwoPointsAddedRandomisedBest15(unvisitedNodesForOneTour, tour.back(), bestPairs, whichTour, selectionPop);
+				}
+				else
+				{
+				getPickUpDeliveryPointPairsTwoPointsAddedRandomised(unvisitedNodesForOneTour, tour.back(), bestPairs, whichTour);
+				}
+			}
+		
+		
+		
+		
 		if (bestPairs[0]==0)
 		{
 			criterion=false;
@@ -250,6 +279,80 @@ void TourPickupDeliveryPointPairs::getPickUpDeliveryPointPairsTwoPointsAddedRand
 				{
 					bestPairs[0]=positions[k-1][0];
 					bestPairs[1]=positions[k-1][1];
+					break;
+				}
+			}
+		}
+	cout << "The best pair is: " << bestPairs[0] << " and " << bestPairs[1] << endl;
+   return;
+}
+
+
+void TourPickupDeliveryPointPairs::getPickUpDeliveryPointPairsTwoPointsAddedRandomisedBest15 (vector<int> unvisitedCities, int startNode, vector <int> & bestPairs, int whichTour, int selectionPop)
+{
+    double max = -DBL_MAX;
+	vector <mypair2> probabilities;
+	vector <vector <int>> positions;
+	std::vector <int> a;
+	a.push_back(0);
+	a.push_back(0);
+	int randNumber;
+	//probabilities.push_back(0);
+    //int best = startNode;
+    
+	for(int i=0; i<unvisitedCities.size(); i++)
+    {
+		if(unvisitedCities[i]==0) continue; 
+		for(int j=0; j<unvisitedCities.size(); j++)
+		{
+			if(unvisitedCities[j]==0) continue; 
+			//if (startNode == i) continue; 
+			//if (startNode == j) continue; 
+			//getProfitMatrixForPickupAndDeliveryPairs (startNode, whichTour);
+			//cout << "the i: " << i << "the profitperdistancematrix[startnode][i]" << profitPerDistanceMatrix[startNode][i] << " a max value: " << max << endl;
+			if (profitPerDistanceMatrix[i][j]>0)
+			{
+			std::vector <int> pair;
+			pair.push_back(i);
+			pair.push_back(j);
+			positions.push_back(pair);
+			probabilities.push_back(std::make_pair(profitPerDistanceMatrix[i][j], pair));
+			}	
+		}
+	}
+
+	
+		//best15Pairs.push_back(std::make_pair( max, i));
+	std::sort (probabilities.begin(), probabilities.end(), comparator);
+
+	if (probabilities.size()>selectionPop)
+	{
+	probabilities.erase(probabilities.begin()+selectionPop, probabilities.end());
+	}
+	
+	probabilities.insert(probabilities.begin(),std::make_pair(0,a));
+
+
+
+	for(int k=1; k<probabilities.size(); k++)
+	{
+		probabilities[k].first=probabilities[k-1].first+probabilities[k].first;
+	}
+
+	double total=probabilities.back().first;
+		
+	if (probabilities.back().first>0)
+		{
+		
+		int total=floor(probabilities.back().first);
+		srand(time(NULL));
+		randNumber= (double) rand() / (RAND_MAX + 1) * total;
+			for(int k=1; k<probabilities.size(); k++)
+			{
+				if (randNumber<=probabilities[k].first && randNumber>probabilities[k-1].first)
+				{
+					bestPairs[0]=probabilities[k-1].second[0];
+					bestPairs[1]=probabilities[k-1].second[1];
 					break;
 				}
 			}
