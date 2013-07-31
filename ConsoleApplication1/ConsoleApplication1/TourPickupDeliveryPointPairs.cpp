@@ -15,7 +15,7 @@ bool comparator (const mypair2& l, const mypair2& r )
 
 TourPickupDeliveryPointPairs::TourPickupDeliveryPointPairs(string inputFile, int selectionPop): OrienteeringProblemWithPickupsAndDeliveries(inputFile)
 {
-	for (int seedNumber=0; seedNumber<10; seedNumber++) // 100 seed run
+	for (int seedNumber=0; seedNumber<5; seedNumber++) // 100 seed run
 	{
 	//int seedNumber=44;
 	solutionTours.clear();
@@ -61,7 +61,10 @@ void TourPickupDeliveryPointPairs::pickUpPointToChoose(vector<int> & nodes)
 
 
 void TourPickupDeliveryPointPairs::calcTourChoosePickupAndDeliveryPointPairs2(int whichTour, int selectionPop){
+	
+	
 	vector<int> unvisitedNodesForOneTour;
+	probabilities.clear();
 
 	unvisitedNodesForOneTour= unvisitedNodes;
 	
@@ -291,7 +294,9 @@ void TourPickupDeliveryPointPairs::getPickUpDeliveryPointPairsTwoPointsAddedRand
 void TourPickupDeliveryPointPairs::getPickUpDeliveryPointPairsTwoPointsAddedRandomisedBest15 (vector<int> unvisitedCities, int startNode, vector <int> & bestPairs, int whichTour, int selectionPop)
 {
     double max = -DBL_MAX;
-	vector <mypair2> probabilities;
+	//vector <mypair2> probabilities;
+	vector <double> probabilitiesCumulated;
+	probabilitiesCumulated.assign(selectionPop+1,0);
 	vector <vector <int>> positions;
 	std::vector <int> a;
 	a.push_back(0);
@@ -300,59 +305,99 @@ void TourPickupDeliveryPointPairs::getPickUpDeliveryPointPairsTwoPointsAddedRand
 	//probabilities.push_back(0);
     //int best = startNode;
     
-	for(int i=0; i<unvisitedCities.size(); i++)
-    {
-		if(unvisitedCities[i]==0) continue; 
-		for(int j=0; j<unvisitedCities.size(); j++)
-		{
-			if(unvisitedCities[j]==0) continue; 
-			//if (startNode == i) continue; 
-			//if (startNode == j) continue; 
-			//getProfitMatrixForPickupAndDeliveryPairs (startNode, whichTour);
-			//cout << "the i: " << i << "the profitperdistancematrix[startnode][i]" << profitPerDistanceMatrix[startNode][i] << " a max value: " << max << endl;
-			if (profitPerDistanceMatrix[i][j]>0)
-			{
-			std::vector <int> pair;
-			pair.push_back(i);
-			pair.push_back(j);
-			positions.push_back(pair);
-			probabilities.push_back(std::make_pair(profitPerDistanceMatrix[i][j], pair));
-			}	
-		}
-	}
 
-	
-		//best15Pairs.push_back(std::make_pair( max, i));
+	if( probabilities.size()==0)
+	{
+
+		for(int i=0; i<unvisitedCities.size(); i++)
+		{
+			if(unvisitedCities[i]==0) continue; 
+			for(int j=0; j<unvisitedCities.size(); j++)
+			{
+				if(unvisitedCities[j]==0) continue; 
+				//if (startNode == i) continue; 
+				//if (startNode == j) continue; 
+				//getProfitMatrixForPickupAndDeliveryPairs (startNode, whichTour);
+				//cout << "the i: " << i << "the profitperdistancematrix[startnode][i]" << profitPerDistanceMatrix[startNode][i] << " a max value: " << max << endl;
+				if (profitPerDistanceMatrix[i][j]>0)
+				{
+				std::vector <int> pair;
+				pair.push_back(i);
+				pair.push_back(j);
+				positions.push_back(pair);
+				probabilities.push_back(std::make_pair(profitPerDistanceMatrix[i][j], pair));
+				}	
+			}
+		}
+	//best15Pairs.push_back(std::make_pair( max, i));
 	std::sort (probabilities.begin(), probabilities.end(), comparator);
 
+	/*
 	if (probabilities.size()>selectionPop)
 	{
 	probabilities.erase(probabilities.begin()+selectionPop, probabilities.end());
 	}
-	
+	*/
+
 	probabilities.insert(probabilities.begin(),std::make_pair(0,a));
 
+		/*
+		for(int k=1; k<probabilities.size(); k++)
+		{
+			probabilities[k].first=probabilities[k-1].first+probabilities[k].first;
+		}
+		*/
 
+	}
 
 	for(int k=1; k<probabilities.size(); k++)
 	{
-		probabilities[k].first=probabilities[k-1].first+probabilities[k].first;
+		if ((unvisitedCities[probabilities[k].second[0]]==0) || (unvisitedCities[probabilities[k].second[1]]==0))
+		{
+			probabilities.erase(probabilities.begin()+k);
+		}	
 	}
 
-	double total=probabilities.back().first;
+
+	if (selectionPop+1<probabilities.size())
+	{
+		for(int k=1; k<selectionPop+1 ; k++)
+		{
+			probabilitiesCumulated[k]=probabilitiesCumulated[k-1]+probabilities[k].first;
+		}
+		int total=floor(probabilitiesCumulated[selectionPop]);
 		
-	if (probabilities.back().first>0)
+	
+	}
+	else 
+	{
+		for(int k=1; k<probabilities.size() ; k++)
+		{
+			probabilitiesCumulated[k]=probabilities[k-1].first+probabilities[k].first;
+		}
+		int total=floor(probabilitiesCumulated[probabilities.size()-1]);
+		for(int m=probabilities.size(); m<selectionPop ; m++)
+		{
+			probabilitiesCumulated.erase(probabilitiesCumulated.begin()+probabilities.size(), probabilitiesCumulated.end());
+		}
+	}
+
+	//probabilitiesCumulated.insert(probabilitiesCumulated.begin(),0);
+
+		
+	if (probabilitiesCumulated.back()>0)
 		{
 		
-		int total=floor(probabilities.back().first);
-		srand(time(NULL));
+		int total=floor(probabilitiesCumulated.back());
+		//srand(time(NULL));
 		randNumber= (double) rand() / (RAND_MAX + 1) * total;
-			for(int k=1; k<probabilities.size(); k++)
+			for(int k=1; k<probabilitiesCumulated.size(); k++)
 			{
-				if (randNumber<=probabilities[k].first && randNumber>probabilities[k-1].first)
+				if (randNumber<=probabilitiesCumulated[k] && randNumber>probabilitiesCumulated[k-1])
 				{
-					bestPairs[0]=probabilities[k-1].second[0];
-					bestPairs[1]=probabilities[k-1].second[1];
+					bestPairs[0]=probabilities[k].second[0];
+					bestPairs[1]=probabilities[k].second[1];
+					probabilities.erase(probabilities.begin()+k);
 					break;
 				}
 			}

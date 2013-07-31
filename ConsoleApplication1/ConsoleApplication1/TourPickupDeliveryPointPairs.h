@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+typedef std::pair <double, vector <int>> mypair2;
+
 class TourPickupDeliveryPointPairs: public OrienteeringProblemWithPickupsAndDeliveries
 {
 	public:
@@ -14,6 +16,7 @@ class TourPickupDeliveryPointPairs: public OrienteeringProblemWithPickupsAndDeli
 	~TourPickupDeliveryPointPairs();
 
 	private:
+	vector <mypair2> probabilities;
 	void pickUpPointToChoose(std::vector<int> & nodes);
 	void calcTourChoosePickupAndDeliveryPointPairs();
 	int getPickUpDeliveryPointPairsOnePointAdded (std::vector<int> unvisitedCities, int startNode);
