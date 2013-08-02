@@ -29,7 +29,7 @@ public:
 
 	void runNearestNeighborDistanceLimit();
 	void runFirstPickupSecondDeliveryPoint();
-	void runTwoOpt();
+	void runTwoOpt(int seedNumber, double timeStart);
 	void runShaking();
 	void runShakingAndTwoopt();
 	double getObjectiveValue(std::vector <int> tour); // Profit minus Cost

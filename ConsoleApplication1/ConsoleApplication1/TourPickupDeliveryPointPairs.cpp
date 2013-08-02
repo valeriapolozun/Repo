@@ -373,7 +373,7 @@ void TourPickupDeliveryPointPairs::getPickUpDeliveryPointPairsTwoPointsAddedRand
 	{
 		for(int k=1; k<probabilities.size() ; k++)
 		{
-			probabilitiesCumulated[k]=probabilities[k-1].first+probabilities[k].first;
+			probabilitiesCumulated[k]=probabilitiesCumulated[k-1]+probabilities[k].first;
 		}
 		int total=floor(probabilitiesCumulated[probabilities.size()-1]);
 		for(int m=probabilities.size(); m<selectionPop ; m++)

@@ -498,14 +498,14 @@ void OrienteeringProblemWithPickupsAndDeliveries::profitsOfAllTheTours(int seedN
 
 }
 
-void OrienteeringProblemWithPickupsAndDeliveries::runTwoOpt()
+void OrienteeringProblemWithPickupsAndDeliveries::runTwoOpt(int seedNumber, double timeStart)
 {
 	for (int i = 0; i < solutionTours.size(); i++)
 	{
 		doTwoOpt(i);
 	}
-	profitsOfAllTheToursOhneGLPK();
-	profitsOfAllTheTours(2, 0);
+	//profitsOfAllTheToursOhneGLPK();
+	profitsOfAllTheTours(seedNumber, timeStart);
 }
 
 

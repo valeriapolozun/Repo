@@ -10,22 +10,42 @@
 
 using namespace std;
 
+bool comparator2 (const mypair2& l, const mypair2& r )
+{ return l.first> r.first;}
 
-TourPickupDeliveryPointPairsParallel::TourPickupDeliveryPointPairsParallel(string inputFile): OrienteeringProblemWithPickupsAndDeliveries(inputFile)
+TourPickupDeliveryPointPairsParallel::TourPickupDeliveryPointPairsParallel(string inputFile, int selectionPop): OrienteeringProblemWithPickupsAndDeliveries(inputFile)
 {
-	bestPairs.assign(2,0);
-	unvisitedNodes.assign(problemSize,1);
-	unvisitedNodes[0]=0;
-	unvisitedNodes[1]=0;
-	calcTourChoosePickupAndDeliveryPointPairs3();
 	
-	profitsOfAllTheTours(1,0);
-	/*
-	for (int i=0; i<solutionTours.size();i++)
+	for (int seedNumber=0; seedNumber<100; seedNumber++) // 100 seed run
 	{
-		cout << "The tour length of the " << i+1 << ". tour is: " << getTourLength(solutionTours[i]) << endl;
-	} 
-	*/
+			
+		solutionTours.clear();
+		srand(seedNumber);
+		double timeStart=clock();
+		bestPairs.assign(2,0);
+		unvisitedNodes.assign(problemSize,1);
+		unvisitedNodes[0]=0;
+		unvisitedNodes[1]=0;
+		vector <mypair2> initMatrix;
+		probabilities.assign(3, initMatrix);
+		calcTourChoosePickupAndDeliveryPointPairs3(selectionPop);
+	
+		profitsOfAllTheTours( seedNumber,timeStart);
+		/*
+		for (int i=0; i<solutionTours.size();i++)
+		{
+			cout << "The tour length of the " << i+1 << ". tour is: " << getTourLength(solutionTours[i]) << endl;
+		} 
+		*/
+		runTwoOpt(seedNumber, timeStart);
+		//profitsOfAllTheTours( seedNumber,timeStart);
+
+		if (selectionPop==1)
+		{
+		break;
+		}
+	}
+	runExcelExport(inputFile, "heurParallelPairs" + std::to_string(selectionPop));
 
 
 }
@@ -47,7 +67,7 @@ void TourPickupDeliveryPointPairsParallel::pickUpPointToChoose(vector<int> & nod
 
 
 
-void TourPickupDeliveryPointPairsParallel::calcTourChoosePickupAndDeliveryPointPairs3() {
+void TourPickupDeliveryPointPairsParallel::calcTourChoosePickupAndDeliveryPointPairs3(int selectionPop) {
 	vector<int> unvisitedNodesForOneTour;
 
 	unvisitedNodesForOneTour= unvisitedNodes;
@@ -77,8 +97,31 @@ void TourPickupDeliveryPointPairsParallel::calcTourChoosePickupAndDeliveryPointP
 	
 	for (int i = 0; i < (problemSize-2); i++)  /// TO DO : Calculate how many times it should run (problemSize-2) is wrong
 	{
+
+		if (selectionPop==1)
+			{
+			getPickUpDeliveryPointPairsTwoPointsAddedRandomised(unvisitedNodes, tour.back(),bestPairs, i%3, selectionPop);
+			}
+			else
+			{
+				if (selectionPop==3 || selectionPop==15)
+				{
+				
+				getPickUpDeliveryPointPairsTwoPointsAddedRandomised(unvisitedNodes, tour.back(),bestPairs, i%3, selectionPop);
+		
+				}
+				else
+				{
+				getPickUpDeliveryPointPairsTwoPointsAddedRandomised(unvisitedNodesForOneTour, tour.back(), bestPairs, i%3,probabilities[i%3].size());
+				}
+			}
+		
+
+
+
+
 		//getPickUpDeliveryPointPairs(unvisitedNodes, bestPairs, i%3);
-		getPickUpDeliveryPointPairsTwoPointsAddedRandomised(unvisitedNodes, tour.back(),bestPairs, i%3);
+		//getPickUpDeliveryPointPairsTwoPointsAddedRandomised(unvisitedNodes, tour.back(),bestPairs, i%3, 3);
 		
 
 		if (!bestPairs[0]==0)
@@ -126,10 +169,9 @@ void TourPickupDeliveryPointPairsParallel::calcTourChoosePickupAndDeliveryPointP
 			}
 			else
 			{
-				wrongPairs[i%numberOfTours].push_back(bestPairs);
+				//wrongPairs[i%numberOfTours].push_back(bestPairs);
 				profitPerDistanceMatrix[bestPairs[0]] [bestPairs[1]]=-DBL_MAX;
-			
-					
+
 			}
 
 			bestPairs[0]=0;
@@ -240,60 +282,110 @@ void TourPickupDeliveryPointPairsParallel::getPickUpDeliveryPointPairs (std::vec
    return;
 }
 
-void TourPickupDeliveryPointPairsParallel::getPickUpDeliveryPointPairsTwoPointsAddedRandomised (vector<int> unvisitedCities, int startNode, vector <int> & bestPairs, int whichTour)
+void TourPickupDeliveryPointPairsParallel::getPickUpDeliveryPointPairsTwoPointsAddedRandomised (vector<int> unvisitedCities, int startNode, vector <int> & bestPairs, int whichTour, int selectionPop)
 {
-    double max = -DBL_MAX;
+    
+	double max = -DBL_MAX;
 	bool wrongPairsFound=false;
-	vector <double> probabilities;
+	//vector <double> probabilities;
 	vector <vector <int>> positions;
 	int randNumber;
-	probabilities.push_back(0);
+	std::vector <int> a;
+	a.push_back(0);
+	a.push_back(0);
+	//probabilities.push_back(0);
     //int best = startNode;
+	vector <double> probabilitiesCumulated;
+	probabilitiesCumulated.assign(selectionPop+1,0);
     
-	for(int i=0; i<unvisitedCities.size(); i++)
-    {
-		if(unvisitedCities[i]==0) continue; 
-		for(int j=1; j<unvisitedCities.size(); j++)
-		{
-			if(unvisitedCities[j]==0) continue; 
-			//if (startNode == i) continue; 
-			//if (startNode == j) continue; 
-			//getProfitMatrixForPickupAndDeliveryPairs (startNode, whichTour);
-			//cout << "the i: " << i << "the profitperdistancematrix[startnode][i]" << profitPerDistanceMatrix[startNode][i] << " a max value: " << max << endl;
-			for(int k=0; k<wrongPairs[whichTour].size(); k++)
+	if (probabilities[whichTour].size()==0)
+	{
+		//for(int n=0; n<numberOfTours; n++)
+		//{
+			for(int i=0; i<unvisitedCities.size(); i++)
 			{
-				if ( wrongPairs[whichTour][k][0]!=0 && wrongPairs[whichTour][k][1]!=0)
+				if(unvisitedCities[i]==0) continue; 
+				for(int j=1; j<unvisitedCities.size(); j++)
 				{
-					wrongPairsFound=true;
+					if(unvisitedCities[j]==0) continue; 
+					//if (startNode == i) continue; 
+					//if (startNode == j) continue; 
+					//getProfitMatrixForPickupAndDeliveryPairs (startNode, whichTour);
+					//cout << "the i: " << i << "the profitperdistancematrix[startnode][i]" << profitPerDistanceMatrix[startNode][i] << " a max value: " << max << endl;
+				
+					/*
+					for(int k=0; k<wrongPairs[whichTour].size(); k++)
+					{
+						if ( wrongPairs[whichTour][k][0]!=0 && wrongPairs[whichTour][k][1]!=0)
+						{
+							wrongPairsFound=true;
+						}
+					}
+					*/
+			
+					if (profitPerDistanceMatrix[i][j]>0)// && (wrongPairsFound==false))
+					{
+					std::vector <int> pair;
+					pair.push_back(i);
+					pair.push_back(j);
+					probabilities[whichTour].push_back(std::make_pair(profitPerDistanceMatrix[i][j], pair));
+		
+					//positions.push_back(pair);
+					}	
 				}
 			}
-			
-			
-			
-			
-			if (profitPerDistanceMatrix[i][j]>0 && (wrongPairsFound==false))
-			{
-			probabilities.push_back(probabilities.back()+profitPerDistanceMatrix[i][j]);
-			std::vector <int> pair;
-			pair.push_back(i);
-			pair.push_back(j);
-			positions.push_back(pair);
-			}	
+			std::sort (probabilities[whichTour].begin(), probabilities[whichTour].end(), comparator2);
+		
+			probabilities[whichTour].insert(probabilities[whichTour].begin(),std::make_pair(0,a));
+		
+	}
+
+	for(int k=1; k<probabilities[whichTour].size(); k++)
+	{
+		if ((unvisitedCities[probabilities[whichTour][k].second[0]]==0) || (unvisitedCities[probabilities[whichTour][k].second[1]]==0))
+		{
+			probabilities[whichTour].erase(probabilities[whichTour].begin()+k);
+		}	
+	}
+
+
+	if (selectionPop+1<probabilities[whichTour].size())
+	{
+		for(int k=1; k<selectionPop+1 ; k++)
+		{
+			probabilitiesCumulated[k]=probabilitiesCumulated[k-1]+probabilities[whichTour][k].first;
+		}
+		int total=floor(probabilitiesCumulated[selectionPop]);
+		
+	
+	}
+	else 
+	{
+		for(int k=1; k<probabilities[whichTour].size() ; k++)
+		{
+			probabilitiesCumulated[k]=probabilitiesCumulated[k-1]+probabilities[whichTour][k].first;
+		}
+		int total=floor(probabilitiesCumulated[probabilities.size()-1]);
+		for(int m=probabilities.size(); m<selectionPop ; m++)
+		{
+			probabilitiesCumulated.erase(probabilitiesCumulated.begin()+probabilities.size(), probabilitiesCumulated.end());
 		}
 	}
-		
-		if (probabilities.back()>0)
+
+
+		if (probabilitiesCumulated.back()>0)
 		{
 		
-		int total=floor(probabilities.back());
-		srand(time(NULL));
+		int total=floor(probabilitiesCumulated.back());
+		//srand(time(NULL));
 		randNumber= (double) rand() / (RAND_MAX + 1) * total;
-			for(int k=1; k<probabilities.size(); k++)
+			for(int k=1; k<probabilitiesCumulated.size(); k++)
 			{
-				if (randNumber<=probabilities[k] && randNumber>probabilities[k-1])
+				if (randNumber<=probabilitiesCumulated[k] && randNumber>probabilitiesCumulated[k-1])
 				{
-					bestPairs[0]=positions[k-1][0];
-					bestPairs[1]=positions[k-1][1];
+					bestPairs[0]=probabilities[whichTour][k].second[0];
+					bestPairs[1]=probabilities[whichTour][k].second[1];
+					probabilities[whichTour].erase(probabilities[whichTour].begin()+k);
 					break;
 				}
 			}
