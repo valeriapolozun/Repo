@@ -72,21 +72,20 @@ int main(int argc, char **argv) {
 	
 	OrienteeringProblemWithPickupsAndDeliveries proba ("set_64_1_50_300.txt");
 	proba.runExcelExportStart();
-	for (int i=15; i<16; i+=5)
+	for (int i=50; i<81; i+=5)
 	{
-		//TourGreedyEinzelnePunkteSeriell tourgreedyeinzeln("set_64_1_" + std::to_string(i) + "_300.txt", 1);
-		//TourGreedyEinzelnePunkteSeriell tourgreedyeinzeln2("set_64_1_" + std::to_string(i) + "_300.txt", 3);
-		//TourGreedyEinzelnePunkteSeriell tourgreedyeinzeln3("set_64_1_" + std::to_string(i) + "_300.txt", 15);
-		//TourGreedyEinzelnePunkteSeriell tourgreedyeinzeln4("set_64_1_" + std::to_string(i) + "_300.txt", 20);
-		//TourPickupDeliveryPointPairs pickupdeliverypairs("set_64_1_" + std::to_string(i) + "_300.txt", 1);
-		//TourPickupDeliveryPointPairs pickupdeliverypairs2("set_64_1_" + std::to_string(i) + "_300.txt", 3);
-		//TourPickupDeliveryPointPairs pickupdeliverypairs3("set_64_1_" + std::to_string(i) + "_300.txt", 15);
-		//TourPickupDeliveryPointPairs pickupdeliverypairs4("set_64_1_" + std::to_string(i) + "_300.txt", 20);
-		TourPickupDeliveryPointPairsParallel pickupdeliverypairsparallel("set_64_1_50_300.txt", 1);
-		//pickupdeliverypairsparallel.runTwoOpt;
-		//TourPickupDeliveryPointPairsParallel pickupdeliverypairsparallel2("set_64_1_50_300.txt", 3);
-		//TourPickupDeliveryPointPairsParallel pickupdeliverypairsparallel3("set_64_1_50_300.txt", 15);
-		//TourPickupDeliveryPointPairsParallel pickupdeliverypairsparallel4("set_64_1_50_300.txt", 20);
+		TourGreedyEinzelnePunkteSeriell tourgreedyeinzeln("set_64_1_" + std::to_string(i) + "_300.txt", 1);
+		TourGreedyEinzelnePunkteSeriell tourgreedyeinzeln2("set_64_1_" + std::to_string(i) + "_300.txt", 3);
+		TourGreedyEinzelnePunkteSeriell tourgreedyeinzeln3("set_64_1_" + std::to_string(i) + "_300.txt", 15);
+		TourGreedyEinzelnePunkteSeriell tourgreedyeinzeln4("set_64_1_" + std::to_string(i) + "_300.txt", 20);
+		TourPickupDeliveryPointPairs pickupdeliverypairs("set_64_1_" + std::to_string(i) + "_300.txt", 1);
+		TourPickupDeliveryPointPairs pickupdeliverypairs2("set_64_1_" + std::to_string(i) + "_300.txt", 3);
+		TourPickupDeliveryPointPairs pickupdeliverypairs3("set_64_1_" + std::to_string(i) + "_300.txt", 15);
+		TourPickupDeliveryPointPairs pickupdeliverypairs4("set_64_1_" + std::to_string(i) + "_300.txt", 20);
+		TourPickupDeliveryPointPairsParallel pickupdeliverypairsparallel("set_64_1_" + std::to_string(i) + "_300.txt", 1);
+		TourPickupDeliveryPointPairsParallel pickupdeliverypairsparallel2("set_64_1_" + std::to_string(i) + "_300.txt", 3);
+		TourPickupDeliveryPointPairsParallel pickupdeliverypairsparallel3("set_64_1_" + std::to_string(i) + "_300.txt", 15);
+		TourPickupDeliveryPointPairsParallel pickupdeliverypairsparallel4("set_64_1_" + std::to_string(i) + "_300.txt", 20);
 	}
 	proba.runExcelExportFinish();
 

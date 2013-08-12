@@ -9,6 +9,7 @@ using namespace std;
 
 ProfitCalculator:: ProfitCalculator(std::vector <int> tourInput,std::vector <Coordinates> basicDataInput, double maxCapacityInput, double tourLengthInput, clock_t clock_start, clock_t clockStartThisSolution ) 
 {
+
 	upperbound = - 1;
 	CPUtime = 0;
 	Iteratations =	CPUtimetotal = 0;

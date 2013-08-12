@@ -30,14 +30,18 @@ TourPickupDeliveryPointPairsParallel::TourPickupDeliveryPointPairsParallel(strin
 		probabilities.assign(3, initMatrix);
 		calcTourChoosePickupAndDeliveryPointPairs3(selectionPop);
 	
-		profitsOfAllTheTours( seedNumber,timeStart);
+		profitsOfAllTheTours(seedNumber,timeStart);
+		runExcelExport(inputFile, "heurParallelPairs" + std::to_string(selectionPop));
 		/*
 		for (int i=0; i<solutionTours.size();i++)
 		{
 			cout << "The tour length of the " << i+1 << ". tour is: " << getTourLength(solutionTours[i]) << endl;
 		} 
 		*/
-		runTwoOpt(seedNumber, timeStart);
+		//runTwoOpt(seedNumber, timeStart);
+		//runExcelExport(inputFile, "heurParallelPairs" + std::to_string(selectionPop) + "+2opt");
+		//doInsertion(seedNumber, timeStart);
+		//runExcelExport(inputFile, "heurParallelPairs" + std::to_string(selectionPop) + "+2opt+insertion");
 		//profitsOfAllTheTours( seedNumber,timeStart);
 
 		if (selectionPop==1)
@@ -45,7 +49,7 @@ TourPickupDeliveryPointPairsParallel::TourPickupDeliveryPointPairsParallel(strin
 		break;
 		}
 	}
-	runExcelExport(inputFile, "heurParallelPairs" + std::to_string(selectionPop));
+	//runExcelExport(inputFile, "heurParallelPairs" + std::to_string(selectionPop));
 
 
 }
@@ -95,7 +99,9 @@ void TourPickupDeliveryPointPairsParallel::calcTourChoosePickupAndDeliveryPointP
 	unvisitedNodesForOneTour[1]=0;
 	*/
 	
-	for (int i = 0; i < (problemSize-2); i++)  /// TO DO : Calculate how many times it should run (problemSize-2) is wrong
+
+
+	for (int i = 0; i < problemSize*problemSize; i++)  /// TO DO : Calculate how many times it should run (problemSize-2) is wrong
 	{
 
 		if (selectionPop==1)
@@ -112,7 +118,7 @@ void TourPickupDeliveryPointPairsParallel::calcTourChoosePickupAndDeliveryPointP
 				}
 				else
 				{
-				getPickUpDeliveryPointPairsTwoPointsAddedRandomised(unvisitedNodesForOneTour, tour.back(), bestPairs, i%3,probabilities[i%3].size());
+				getPickUpDeliveryPointPairsTwoPointsAddedRandomised(unvisitedNodesForOneTour, tour.back(), bestPairs, i%3, selectionPop);
 				}
 			}
 		
@@ -166,6 +172,17 @@ void TourPickupDeliveryPointPairsParallel::calcTourChoosePickupAndDeliveryPointP
 				unvisitedNodes[bestPairs[0]]=0;
 				unvisitedNodesForOneTour[bestPairs[1]]=0;
 				unvisitedNodes[bestPairs[1]]=0;
+				for (int g=1; g< numberOfTours;g++)
+				{
+					for (int f=1; f< probabilities[g].size();f++)
+					{
+						if (probabilities[g][f].second[0]== bestPairs[0] && probabilities[g][f].second[1]==bestPairs[1])
+						{
+							probabilities[g].erase(probabilities[g].begin()+f);
+					
+						}
+					}
+				}
 			}
 			else
 			{
@@ -173,6 +190,7 @@ void TourPickupDeliveryPointPairsParallel::calcTourChoosePickupAndDeliveryPointP
 				profitPerDistanceMatrix[bestPairs[0]] [bestPairs[1]]=-DBL_MAX;
 
 			}
+			
 
 			bestPairs[0]=0;
 			bestPairs[1]=0;
@@ -296,7 +314,7 @@ void TourPickupDeliveryPointPairsParallel::getPickUpDeliveryPointPairsTwoPointsA
 	//probabilities.push_back(0);
     //int best = startNode;
 	vector <double> probabilitiesCumulated;
-	probabilitiesCumulated.assign(selectionPop+1,0);
+	
     
 	if (probabilities[whichTour].size()==0)
 	{
@@ -348,6 +366,13 @@ void TourPickupDeliveryPointPairsParallel::getPickUpDeliveryPointPairsTwoPointsA
 		}	
 	}
 
+	if (selectionPop!=1 && selectionPop!=3 && selectionPop!=15)
+	{
+		selectionPop= probabilities[whichTour].size();
+	}
+
+	probabilitiesCumulated.assign(selectionPop+1,0);
+
 
 	if (selectionPop+1<probabilities[whichTour].size())
 	{
@@ -365,10 +390,10 @@ void TourPickupDeliveryPointPairsParallel::getPickUpDeliveryPointPairsTwoPointsA
 		{
 			probabilitiesCumulated[k]=probabilitiesCumulated[k-1]+probabilities[whichTour][k].first;
 		}
-		int total=floor(probabilitiesCumulated[probabilities.size()-1]);
-		for(int m=probabilities.size(); m<selectionPop ; m++)
+		int total=floor(probabilitiesCumulated[probabilities[whichTour].size()-1]);
+		for(int m=probabilities[whichTour].size(); m<selectionPop+1 ; m++)
 		{
-			probabilitiesCumulated.erase(probabilitiesCumulated.begin()+probabilities.size(), probabilitiesCumulated.end());
+			probabilitiesCumulated.erase(probabilitiesCumulated.begin()+probabilities[whichTour].size(), probabilitiesCumulated.end());
 		}
 	}
 

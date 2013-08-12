@@ -52,7 +52,7 @@ public:
 	void erasePoints(int neighborhoodSize, double percentageToErase);
 	void insertPoints(vector<Coordinates> basicData, int whichTour);
 	bool isZero (int i);
-	void doInsertion();
+	void doInsertion(int seedNumber, double timeStart);
 	double maxCapacity;
 
 
@@ -88,7 +88,8 @@ protected:
 	vector <double> finalSolutions;
 	
 	int countSolutionRuns;
-	int getNextPickupPointRandomised(vector <int> unvisitedPickups, vector <int> unvisitedDeliveries, int startNode);
+	int getNextPickupPointRandomised(vector <int> unvisitedPickups, vector <int> unvisitedDeliveries, int startNode, vector <int> tour);
+	int getNextDeliveryPointRandomised(vector <int> unvisitedPickups, vector <int> unvisitedDeliveries, int startNode,  vector <int> tour);
 	void pickupPoint (std::vector<int> & nodes);
 	void deliveryPoint (std::vector<int> & nodes);
 	vector <int> pickupPoints;

@@ -21,7 +21,7 @@ TourGreedyEinzelnePunkteSeriell::TourGreedyEinzelnePunkteSeriell(string inputFil
 {
 
 	
-	for (int seedNumber=0; seedNumber<10; seedNumber++) // 100 seed run
+	for (int seedNumber=0; seedNumber<100; seedNumber++) // 100 seed run
 	{
 	//int seedNumber=44;
 		solutionTours.clear();
@@ -32,17 +32,31 @@ TourGreedyEinzelnePunkteSeriell::TourGreedyEinzelnePunkteSeriell(string inputFil
 		deliveryPointInserted=false;
 		double timeStart=clock();
 		//double timeStart=0;
+		getProfitMatrixForPickupAndDeliveryPairsParallel(0);
 		for (int i=0; i<numberOfTours;i++)
 		{
 			calcTourChoosePickupAndDeliveryPointPairs(i, selectionPop);
 		} 
 		profitsOfAllTheTours(seedNumber, timeStart);
+		
+	runExcelExport(inputFile, "heurSeriellPoint" + std::to_string(selectionPop));
+	runTwoOpt(seedNumber, timeStart);
+	runExcelExport(inputFile, "heurSeriellPoint" + std::to_string(selectionPop) + "+2opt");
+	doInsertion(seedNumber, timeStart);
+	runExcelExport(inputFile, "heurSeriellPoint" + std::to_string(selectionPop) + "+2opt+insertion");
+
 		for (int i=0; i<solutionTours.size();i++)
 		{
 			cout << "The tour length of the " << i+1 << ". tour is: " << getTourLength(solutionTours[i]) << endl;
 		} 
+		if (selectionPop==1)
+		{
+		break;
+		}
+
+
 	}
-	runExcelExport(inputFile, "heurSeriell" + std::to_string(selectionPop));
+	
 
 }
 

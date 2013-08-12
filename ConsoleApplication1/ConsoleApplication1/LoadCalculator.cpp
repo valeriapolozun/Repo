@@ -23,6 +23,7 @@ LoadCalculator:: LoadCalculator (vector <int> & load, vector <int> & goodsOnTheL
 
 void LoadCalculator::loadCalculation(vector <int> & load, vector <int> & goodsOnTheLorry, vector <double> intensity, vector <int> quantities)
 {
+	load.clear();
 	load.push_back(0);
 	goodsOnTheLorry.push_back(0);
 	for (int i=1; i < intensity.size(); i++)
