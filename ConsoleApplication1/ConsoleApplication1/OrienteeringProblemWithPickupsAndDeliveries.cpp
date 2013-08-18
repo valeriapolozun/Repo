@@ -476,6 +476,9 @@ void OrienteeringProblemWithPickupsAndDeliveries::profitsOfAllTheTours(int seedN
 		finalSolutions.clear();
 
 	}
+	//RprintsolNEW(rexe, rpath, filename,countSolutionRuns, result);
+	
+
 	//finalSolutions.push_back(result);
 	//finalSolutions.push_back(time);
 
@@ -656,7 +659,7 @@ void OrienteeringProblemWithPickupsAndDeliveries::doTwoOpt(int whichTour)
 							goodsOnTheLorry[whichTour][k]=goodsOnTheLorry[whichTour][k-1] + load[whichTour][k];
 						}
 						ProfitCalculatorOhneGLPK newProfit ( solutionTours[whichTour], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity(), getTourLength(solutionTours[whichTour]), intensity[whichTour], clock_start, clockStartThisSolution);
-						cout << "The new profit is:   " << newProfit.getProfit() << endl;
+						//cout << "The new profit is:   " << newProfit.getProfit() << endl;
 						
 						criterion=true;
 						break;
@@ -927,7 +930,7 @@ void OrienteeringProblemWithPickupsAndDeliveries::insertPoints(vector <Coordinat
 		insertionEnd=true;
 		}
 	}
-	
+	/*
 	cout << "The tours after inserting points  "<< endl;
 	for(int i = 0; i < solutionTours.size(); i++)
 	{
@@ -938,7 +941,7 @@ void OrienteeringProblemWithPickupsAndDeliveries::insertPoints(vector <Coordinat
 		}
 		cout<<endl;
 	}
-
+	*/
 	
 
 }
@@ -1419,3 +1422,73 @@ void OrienteeringProblemWithPickupsAndDeliveries::runExcelExport(string inputFil
 	//MyExcelFile.close();
 
 };
+
+
+
+void OrienteeringProblemWithPickupsAndDeliveries::saveSolution(string fname, double result)
+{
+		vector<Coordinates> basicData(inputDataProcessor.getBasicData());
+		ofstream myfile;
+		myfile.open (fname);
+		myfile << "result = list() " << endl;
+
+
+		myfile << "result$profit =  " << result << endl;
+		myfile << "result$bound = " << -1 << endl;
+		myfile << "result$length = list()" << endl;
+		myfile << "result$length[[1]] = " << inputDataProcessor.getMaximumTourLength() << endl;
+		myfile << "result$length[[2]] = " << inputDataProcessor.getMaximumTourLength() << endl;
+		myfile << "result$length[[3]] = " << inputDataProcessor.getMaximumTourLength() << endl;
+		myfile << "result$maxload = list()" << endl;
+		myfile << "result$maxload[[1]] = " << inputDataProcessor.getMaximumLoadCapacity() << endl;
+		myfile << "result$maxload[[2]] = " << inputDataProcessor.getMaximumLoadCapacity() << endl;
+		myfile << "result$maxload[[3]] = " << inputDataProcessor.getMaximumLoadCapacity() << endl;
+		myfile << "result$cputime = " << 0 << endl;//CPUtime
+		myfile << "result$cputimetotal = " << 0 << endl; //CPUtimetotal
+		myfile << "result$iterations = " << 0 << endl;
+		myfile << "result$tour = list()" << endl;
+		myfile << "result$intensity = list()" << endl;
+		myfile << "result$quantity = list()" << endl;
+		for (int m=0; m<numberOfTours;m++)
+		{
+			myfile << "result$tour[[" << m+1 << "]]= c(";
+			for(int i = 0; i < solutionTours[m].size()-1; i++){
+				myfile << 1 + solutionTours[m][i] << ", ";
+			}
+			myfile << 1 + solutionTours[m][solutionTours[m].size()-1] << ")" << endl;
+			myfile << "result$intensity[[" << m+1 << "]]= c(";
+			for(int i = 0; i < intensity[m].size()-1; i++){
+				myfile << intensity[m][i] << ", ";
+			}
+			myfile << intensity[m][intensity[m].size()-1] << ")" << endl;
+			myfile << "result$quantity[[" << m+1 << "]]= c(";
+			for(int i = 0; i < solutionTours[m].size()-1; i++){
+				myfile << intensity[m][i]* basicData[solutionTours[m][i]].quantity << ", ";
+			}
+			myfile << intensity[m][intensity[m].size()-1]* basicData[solutionTours[m][solutionTours[m].size()-1]].quantity << ")" << endl;
+		}
+		myfile.close();
+	};
+
+void  OrienteeringProblemWithPickupsAndDeliveries::RprintsolNEW(string rexe, string rpath, string filename, int & countSolutionRuns, double result){
+	
+	countSolutionRuns=countSolutionRuns+1;
+	saveSolution( rpath + "example1.txt", result);
+	inputDataProcessor.Rsavesinstance(rpath + "example2.txt");		
+	string syscommand("\"C:\\Program Files\\R\\R-3.0.1\\bin\\R\" -f C:\\Users\\User\\Documents\\Rfiles\\start.r");
+	//replace(syscommand.begin(),syscommand.end(),'/','\\');
+	system(syscommand.c_str());
+
+	string rename ("rename \"C:\\Users\\User\\Documents\\Rfiles\\test123.pdf\" \"tour" + std::to_string(countSolutionRuns) + ".pdf\"");
+	system( rename.c_str());
+	
+	
+double time_c=(double)(clock()- clock_start)/CLOCKS_PER_SEC;
+cout << time_c;
+
+}
+
+
+
+
+

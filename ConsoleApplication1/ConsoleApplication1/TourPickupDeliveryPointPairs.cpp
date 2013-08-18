@@ -17,7 +17,7 @@ TourPickupDeliveryPointPairs::TourPickupDeliveryPointPairs(string inputFile, int
 {
 	for (int seedNumber=0; seedNumber<100; seedNumber++) // 100 seed run
 	{
-	//int seedNumber=44;
+	//int seedNumber=12;
 	solutionTours.clear();
 
 
@@ -56,7 +56,7 @@ TourPickupDeliveryPointPairs::TourPickupDeliveryPointPairs(string inputFile, int
 
 
 
-	}
+}
 
 
 	
@@ -191,6 +191,7 @@ void TourPickupDeliveryPointPairs::calcTourChoosePickupAndDeliveryPointPairs2(in
 	if (tour.size()==2)
 	{
 		unvisitedNodes.assign(problemSize, 0);
+		solutionTours.push_back(tour);
 	}
 	else 
 	{
@@ -463,7 +464,7 @@ void TourPickupDeliveryPointPairs::getPickUpDeliveryPointPairsTwoPointsAddedRand
 		randNumber= (double) rand() / (RAND_MAX + 1) * total;
 			for(int k=1; k<probabilitiesCumulated.size(); k++)
 			{
-				if (randNumber<=probabilitiesCumulated[k] && randNumber>probabilitiesCumulated[k-1])
+				if (randNumber<=probabilitiesCumulated[k] && randNumber>=probabilitiesCumulated[k-1])
 				{
 					bestPairs[0]=probabilities[k].second[0];
 					bestPairs[1]=probabilities[k].second[1];

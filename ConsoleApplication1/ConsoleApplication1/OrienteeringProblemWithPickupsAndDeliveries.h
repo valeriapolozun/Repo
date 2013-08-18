@@ -54,7 +54,8 @@ public:
 	bool isZero (int i);
 	void doInsertion(int seedNumber, double timeStart);
 	double maxCapacity;
-
+	void saveSolution(string fname, double result);
+	void RprintsolNEW(string rexe, string rpath, string filename, int & countSolutionRuns, double result);
 
 
 

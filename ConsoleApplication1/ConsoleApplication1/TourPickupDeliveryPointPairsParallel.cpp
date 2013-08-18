@@ -38,12 +38,12 @@ TourPickupDeliveryPointPairsParallel::TourPickupDeliveryPointPairsParallel(strin
 			cout << "The tour length of the " << i+1 << ". tour is: " << getTourLength(solutionTours[i]) << endl;
 		} 
 		*/
-		//runTwoOpt(seedNumber, timeStart);
-		//runExcelExport(inputFile, "heurParallelPairs" + std::to_string(selectionPop) + "+2opt");
-		//doInsertion(seedNumber, timeStart);
-		//runExcelExport(inputFile, "heurParallelPairs" + std::to_string(selectionPop) + "+2opt+insertion");
-		//profitsOfAllTheTours( seedNumber,timeStart);
 
+		runTwoOpt(seedNumber, timeStart);
+		runExcelExport(inputFile, "heurParallelPairs" + std::to_string(selectionPop) + "+2opt");
+		doInsertion(seedNumber, timeStart);
+		runExcelExport(inputFile, "heurParallelPairs" + std::to_string(selectionPop) + "+2opt+insertion");
+		
 		if (selectionPop==1)
 		{
 		break;
@@ -101,7 +101,7 @@ void TourPickupDeliveryPointPairsParallel::calcTourChoosePickupAndDeliveryPointP
 	
 
 
-	for (int i = 0; i < problemSize*problemSize; i++)  /// TO DO : Calculate how many times it should run (problemSize-2) is wrong
+	for (int i = 0; i < problemSize*problemSize*numberOfTours; i++)  /// TO DO : Calculate how many times it should run (problemSize-2) is wrong
 	{
 
 		if (selectionPop==1)
@@ -118,7 +118,7 @@ void TourPickupDeliveryPointPairsParallel::calcTourChoosePickupAndDeliveryPointP
 				}
 				else
 				{
-				getPickUpDeliveryPointPairsTwoPointsAddedRandomised(unvisitedNodesForOneTour, tour.back(), bestPairs, i%3, selectionPop);
+				getPickUpDeliveryPointPairsTwoPointsAddedRandomised(unvisitedNodes, tour.back(), bestPairs, i%3, selectionPop);
 				}
 			}
 		
@@ -172,6 +172,7 @@ void TourPickupDeliveryPointPairsParallel::calcTourChoosePickupAndDeliveryPointP
 				unvisitedNodes[bestPairs[0]]=0;
 				unvisitedNodesForOneTour[bestPairs[1]]=0;
 				unvisitedNodes[bestPairs[1]]=0;
+				/*
 				for (int g=1; g< numberOfTours;g++)
 				{
 					for (int f=1; f< probabilities[g].size();f++)
@@ -183,13 +184,16 @@ void TourPickupDeliveryPointPairsParallel::calcTourChoosePickupAndDeliveryPointP
 						}
 					}
 				}
+				*/
 			}
 			else
+			/*
 			{
 				//wrongPairs[i%numberOfTours].push_back(bestPairs);
 				profitPerDistanceMatrix[bestPairs[0]] [bestPairs[1]]=-DBL_MAX;
 
 			}
+			*/
 			
 
 			bestPairs[0]=0;
@@ -358,13 +362,18 @@ void TourPickupDeliveryPointPairsParallel::getPickUpDeliveryPointPairsTwoPointsA
 		
 	}
 
-	for(int k=1; k<probabilities[whichTour].size(); k++)
+/*
+	for (int l=0;l<probabilities.size();l++)
 	{
-		if ((unvisitedCities[probabilities[whichTour][k].second[0]]==0) || (unvisitedCities[probabilities[whichTour][k].second[1]]==0))
+*/
+		for(int k=probabilities[whichTour].size()-1; k>0; k--)
 		{
-			probabilities[whichTour].erase(probabilities[whichTour].begin()+k);
-		}	
-	}
+			if ((unvisitedCities[probabilities[whichTour][k].second[0]]==0) || (unvisitedCities[probabilities[whichTour][k].second[1]]==0))
+			{
+				probabilities[whichTour].erase(probabilities[whichTour].begin()+k);
+			}	
+		}
+	//}
 
 	if (selectionPop!=1 && selectionPop!=3 && selectionPop!=15)
 	{
@@ -406,7 +415,7 @@ void TourPickupDeliveryPointPairsParallel::getPickUpDeliveryPointPairsTwoPointsA
 		randNumber= (double) rand() / (RAND_MAX + 1) * total;
 			for(int k=1; k<probabilitiesCumulated.size(); k++)
 			{
-				if (randNumber<=probabilitiesCumulated[k] && randNumber>probabilitiesCumulated[k-1])
+				if (randNumber<=probabilitiesCumulated[k] && randNumber>=probabilitiesCumulated[k-1])
 				{
 					bestPairs[0]=probabilities[whichTour][k].second[0];
 					bestPairs[1]=probabilities[whichTour][k].second[1];

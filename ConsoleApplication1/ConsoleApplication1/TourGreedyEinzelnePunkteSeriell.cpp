@@ -429,7 +429,7 @@ int TourGreedyEinzelnePunkteSeriell::getNextPickupPointRandomisedBest15(vector <
 	randNumber= (double) rand() / (double) (RAND_MAX + 1)* total  ;
 	for(int k=1; k<best15Pairs.size(); k++)
 	{
-		if (randNumber<=best15Pairs[k].first && randNumber>best15Pairs[k-1].first)
+		if (randNumber<=best15Pairs[k].first && randNumber>=best15Pairs[k-1].first)
 		{
 			bestToChoose = unvisitedPickups[best15Pairs[k-1].second];
 			break;
@@ -534,7 +534,7 @@ int TourGreedyEinzelnePunkteSeriell::getNextDeliveryPointRandomised(vector <int>
 	randNumber= (double) rand() / (double) (RAND_MAX + 1) * total;
 	for(int k=1; k<cumulatedDistances.size(); k++)
 	{
-		if (randNumber<=cumulatedDistances[k] && randNumber>cumulatedDistances[k-1])
+		if (randNumber<=cumulatedDistances[k] && randNumber>=cumulatedDistances[k-1])
 		{
 			bestToChoose = unvisitedDeliveries[k-1];
 			break;
@@ -591,7 +591,7 @@ int TourGreedyEinzelnePunkteSeriell::getNextDeliveryPointRandomisedBest15(vector
 	randNumber= (double) rand() / (double) (RAND_MAX + 1)* total  ;
 	for(int k=1; k<best15Pairs.size(); k++)
 	{
-		if (randNumber<=best15Pairs[k].first && randNumber>best15Pairs[k-1].first)
+		if (randNumber<=best15Pairs[k].first && randNumber>=best15Pairs[k-1].first)
 		{
 			bestToChoose = unvisitedDeliveries[best15Pairs[k-1].second];
 			break;
