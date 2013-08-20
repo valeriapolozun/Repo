@@ -15,9 +15,11 @@ bool comparator (const mypair2& l, const mypair2& r )
 
 TourPickupDeliveryPointPairs::TourPickupDeliveryPointPairs(string inputFile, int selectionPop): OrienteeringProblemWithPickupsAndDeliveries(inputFile)
 {
+	twoOpt=false;
+
 	for (int seedNumber=0; seedNumber<100; seedNumber++) // 100 seed run
 	{
-	//int seedNumber=12;
+	
 	solutionTours.clear();
 
 
@@ -30,20 +32,37 @@ TourPickupDeliveryPointPairs::TourPickupDeliveryPointPairs(string inputFile, int
 	wrongPairs.clear();
 	//calcPickupDeliveryPointPairs();
 	getProfitMatrixForPickupAndDeliveryPairsParallel(0);
+	vector<int> tour;
+	tour.push_back(0);
+	tour.push_back(1);
 
 	for (int i=0; i<numberOfTours;i++)
 	{
+		solutionTours.push_back(tour);
 		//getProfitMatrixForPickupAndDeliveryPairs(0, i);
 		calcTourChoosePickupAndDeliveryPointPairs2(i, selectionPop);
 	} 
 
 	profitsOfAllTheTours(seedNumber,timeStart);
+
+	if (twoOpt==false)
+	{
+	runExcelExport(inputFile, "heurSeriellPairs" + std::to_string(selectionPop));
+	
+	}
+	else
+	{
+	runExcelExport(inputFile, "heurSeriellPairs" + std::to_string(selectionPop) + "+2opt");
+	}
+
+
+	/*
 	runExcelExport(inputFile, "heurSeriellPairs" + std::to_string(selectionPop));
 	runTwoOpt(seedNumber, timeStart);
 	runExcelExport(inputFile, "heurSeriellPairs" + std::to_string(selectionPop) + "+2opt");
 	doInsertion(seedNumber, timeStart);
 	runExcelExport(inputFile, "heurSeriellPairs" + std::to_string(selectionPop) + "+2opt+insertion");
-
+	*/
 	for (int i=0; i<solutionTours.size();i++)
 	{
 		cout << "The tour length of the " << i+1 << ". tour is: " << getTourLength(solutionTours[i]) << endl;
@@ -87,13 +106,13 @@ void TourPickupDeliveryPointPairs::calcTourChoosePickupAndDeliveryPointPairs2(in
 	unvisitedNodesForOneTour= unvisitedNodes;
 	
 	int startNode=0;
-	vector<int> tour;
-	tour.push_back(0);
+	//vector<int> tour;
+	//solutionTours[whichTour].push_back(0);
 	
 	unvisitedNodesForOneTour[0]=0;
 	unvisitedNodesForOneTour[1]=0;
 	bool pickupInserted=false;
-	tour.push_back(1);
+	//solutionTours[whichTour].push_back(1);
 	
 	//getProfitMatrixForPickupAndDeliveryPairs (startNode, whichTour);
 	
@@ -109,11 +128,11 @@ void TourPickupDeliveryPointPairs::calcTourChoosePickupAndDeliveryPointPairs2(in
 			{*/
 				if (selectionPop ==1 || selectionPop==3 || selectionPop==15)
 				{
-				getPickUpDeliveryPointPairsTwoPointsAddedRandomisedBest15(unvisitedNodesForOneTour, tour.back(), bestPairs, whichTour, selectionPop);
+				getPickUpDeliveryPointPairsTwoPointsAddedRandomisedBest15(unvisitedNodesForOneTour, solutionTours[whichTour].back(), bestPairs, whichTour, selectionPop);
 				}
 				else
 				{
-				getPickUpDeliveryPointPairsTwoPointsAddedRandomisedBest15(unvisitedNodesForOneTour, tour.back(), bestPairs, whichTour, selectionPop);
+				getPickUpDeliveryPointPairsTwoPointsAddedRandomisedBest15(unvisitedNodesForOneTour, solutionTours[whichTour].back(), bestPairs, whichTour, selectionPop);
 				}
 			//}
 		
@@ -128,16 +147,17 @@ void TourPickupDeliveryPointPairs::calcTourChoosePickupAndDeliveryPointPairs2(in
 		if (!bestPairs[0]==0)
 		{
 		
+	
 			double minTourLengthExtension=DBL_MAX;
 			double TourLengthExtension;
 			int posToInsert;
 			int posToInsert2;
-			for (int j = 0; j < tour.size()-1; j++)
+			for (int j = 0; j < solutionTours[whichTour].size()-1; j++)
 			{
-				for (int k = j; k < tour.size()-1; k++)
+				for (int k = j; k < solutionTours[whichTour].size()-1; k++)
 				{
 
-					if (isTotalLengthUnderLimit2NodesDifferentPlace( tour, bestPairs[0], j+1, bestPairs[1], k+2))
+					if (isTotalLengthUnderLimit2NodesDifferentPlace( solutionTours[whichTour], bestPairs[0], j+1, bestPairs[1], k+2))
 					{
 						int node2pos;
 						if (k==j)
@@ -146,9 +166,9 @@ void TourPickupDeliveryPointPairs::calcTourChoosePickupAndDeliveryPointPairs2(in
 						}
 						else
 						{
-						node2pos=tour[k];
+						node2pos=solutionTours[whichTour][k];
 						}
-						TourLengthExtension= inputDataProcessor.getDistance (tour[j], bestPairs[0])+ inputDataProcessor.getDistance (bestPairs[0], tour[j+1])-inputDataProcessor.getDistance (tour[j], tour[j+1])+inputDataProcessor.getDistance (node2pos, bestPairs[1])+ inputDataProcessor.getDistance (bestPairs[1], tour[k+1])-+ inputDataProcessor.getDistance (node2pos, tour[k+1]);;
+						TourLengthExtension= inputDataProcessor.getDistance (solutionTours[whichTour][j], bestPairs[0])+ inputDataProcessor.getDistance (bestPairs[0], solutionTours[whichTour][j+1])-inputDataProcessor.getDistance (solutionTours[whichTour][j], solutionTours[whichTour][j+1])+inputDataProcessor.getDistance (node2pos, bestPairs[1])+ inputDataProcessor.getDistance (bestPairs[1], solutionTours[whichTour][k+1])-+ inputDataProcessor.getDistance (node2pos, solutionTours[whichTour][k+1]);;
 						if (TourLengthExtension < minTourLengthExtension) 
 						{
 							minTourLengthExtension=TourLengthExtension;
@@ -162,8 +182,15 @@ void TourPickupDeliveryPointPairs::calcTourChoosePickupAndDeliveryPointPairs2(in
 
 			if (minTourLengthExtension!=DBL_MAX)
 			{
-				tour.insert(tour.begin()+posToInsert, bestPairs[0]);
-				tour.insert(tour.begin()+posToInsert2, bestPairs[1]);
+				solutionTours[whichTour].insert(solutionTours[whichTour].begin()+posToInsert, bestPairs[0]);
+				solutionTours[whichTour].insert(solutionTours[whichTour].begin()+posToInsert2, bestPairs[1]);
+				//tour.insert(tour.begin()+posToInsert, bestPairs[0]);
+				//tour.insert(tour.begin()+posToInsert2, bestPairs[1]);
+				if (twoOpt==true)
+				{
+				doTwoOpt(whichTour);
+				}
+				
 				unvisitedNodesForOneTour[bestPairs[0]]=0;
 				unvisitedNodes[bestPairs[0]]=0;
 				unvisitedNodesForOneTour[bestPairs[1]]=0;
@@ -182,26 +209,27 @@ void TourPickupDeliveryPointPairs::calcTourChoosePickupAndDeliveryPointPairs2(in
 		
 	}
 	
-	for (int i=0; i < tour.size(); i++)
+	/*
+	for (int i=0; i < solutionTours[whichTour].size(); i++)
 	{
-		unvisitedNodes[tour[i]]=0;
+		unvisitedNodes[solutionTours[whichTour][i]]=0;
 	}
-	
+	*/
 
-	if (tour.size()==2)
+	if (solutionTours[whichTour].size()==2)
 	{
 		unvisitedNodes.assign(problemSize, 0);
-		solutionTours.push_back(tour);
+		//solutionTours.push_back(tour);
 	}
-	else 
-	{
-		solutionTours.push_back(tour);
+	//else 
+	//{
+	//	solutionTours.push_back(tour);
 
-		for (int i = 0; i < tour.size(); i++)
-		{
-			cout  << i+1 << ". place in the tour " << tour[i] << endl;
-		}
-	}
+		//for (int i = 0; i < tour.size(); i++)
+		//{
+			//cout  << i+1 << ". place in the tour " << tour[i] << endl;
+		//}
+	//}
 	
 }
 
@@ -413,7 +441,7 @@ void TourPickupDeliveryPointPairs::getPickUpDeliveryPointPairsTwoPointsAddedRand
 		*/
 
 	}
-
+	/*
 	for(int k=1; k<probabilities.size(); k++)
 	{
 		if ((unvisitedCities[probabilities[k].second[0]]==0) || (unvisitedCities[probabilities[k].second[1]]==0))
@@ -421,6 +449,22 @@ void TourPickupDeliveryPointPairs::getPickUpDeliveryPointPairsTwoPointsAddedRand
 			probabilities.erase(probabilities.begin()+k);
 		}	
 	}
+	*/
+
+		for(int k=probabilities.size()-1; k>0; k--)
+		{
+			if ((unvisitedCities[probabilities[k].second[0]]==0) || (unvisitedCities[probabilities[k].second[1]]==0))
+			{
+				if (probabilities[k].second[0]==27)
+				{
+				cout << "ooops";
+				}
+				probabilities.erase(probabilities.begin()+k);
+			}	
+		}
+
+
+
 
 	if (selectionPop!=1 && selectionPop!=3 && selectionPop!=15)
 	{

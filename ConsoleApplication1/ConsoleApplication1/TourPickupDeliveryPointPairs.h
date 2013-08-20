@@ -16,6 +16,7 @@ class TourPickupDeliveryPointPairs: public OrienteeringProblemWithPickupsAndDeli
 	~TourPickupDeliveryPointPairs();
 
 	private:
+	bool twoOpt;
 	vector <mypair2> probabilities;
 	void pickUpPointToChoose(std::vector<int> & nodes);
 	void calcTourChoosePickupAndDeliveryPointPairs();

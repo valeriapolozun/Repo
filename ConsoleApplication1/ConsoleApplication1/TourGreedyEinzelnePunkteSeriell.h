@@ -16,6 +16,9 @@ class TourGreedyEinzelnePunkteSeriell: public OrienteeringProblemWithPickupsAndD
 	TourGreedyEinzelnePunkteSeriell(std::string inputFile, int selectionPop);
 	~TourGreedyEinzelnePunkteSeriell();
 
+	protected:
+	bool twoOpt;
+
 	private:
 	vector <int> unvisitedNodesForOneTour;
 	void calcTourChoosePickupAndDeliveryPointPairs(int whichTour, int selectionPop);

@@ -36,6 +36,8 @@ OrienteeringProblemWithPickupsAndDeliveries::OrienteeringProblemWithPickupsAndDe
 	unvisitedNodes[0]=0;
 	unvisitedNodes[1]=0;
 	numberOfTours=3;
+	solutionTours.resize(numberOfTours);
+	intensity.resize(numberOfTours);
 	wrongPairs.resize(numberOfTours);
 	load.resize(numberOfTours);
 	bufferPlus.resize(numberOfTours);
@@ -208,7 +210,7 @@ void OrienteeringProblemWithPickupsAndDeliveries::getProfitMatrixForPickupAndDel
 
 	for (int i = 0; i < problemSize; i++)
 	{
-		for(int j = i+1; j < problemSize; j++)
+		for(int j = 0; j < problemSize; j++)
 		{
 			if(basicData[i].quantity*basicData[j].quantity >= 0 || basicData[i].quantity<=0 || unvisitedNodes[i]==0)   
 			{
@@ -478,12 +480,6 @@ void OrienteeringProblemWithPickupsAndDeliveries::profitsOfAllTheTours(int seedN
 	}
 	//RprintsolNEW(rexe, rpath, filename,countSolutionRuns, result);
 	
-
-	//finalSolutions.push_back(result);
-	//finalSolutions.push_back(time);
-
-	//totalFinalSolutions.push_back(finalSolutions);
-
 	cout << "The total profit of the tours all together :  " << result << endl;
 	cout << "The tours:    "<< endl;
 	for(int i = 0; i < solutionTours.size(); i++)
@@ -590,20 +586,23 @@ void OrienteeringProblemWithPickupsAndDeliveries::doTwoOpt(std::vector <int>  & 
 
 void OrienteeringProblemWithPickupsAndDeliveries::doTwoOpt(int whichTour)
 {  
-	cout << "The tour before 2-opt: "<< endl;
+	/*cout << "The tour before 2-opt: "<< endl;
 		for(int j = 0; j < solutionTours[whichTour].size(); j++)
 		{
 			cout<<solutionTours[whichTour][j] << "   " ;
 		}
 	cout<<endl;
-	
+	*/
 	
 	int n;
 	n= solutionTours[whichTour].size();
 	bool criterion=true;
 	double temp;
 	
-
+	intensity[whichTour].clear();
+	ProfitCalculator initialToursProfit( solutionTours[whichTour], inputDataProcessor.getBasicData(), inputDataProcessor.getMaximumLoadCapacity(), getTourLength(solutionTours[whichTour]), clock_start, clockStartThisSolution); 
+	vector <double> intensityToInsert=  initialToursProfit.getIntensity();
+	intensity[whichTour]=intensityToInsert;
 	LoadCalculator loadCalculation(load[whichTour], goodsOnTheLorry[whichTour], bufferPlus[whichTour], bufferMinus[whichTour], intensity[whichTour], inputDataProcessor.getTourQuantities(solutionTours[whichTour]));
 
 	while (criterion)
@@ -671,13 +670,14 @@ void OrienteeringProblemWithPickupsAndDeliveries::doTwoOpt(int whichTour)
 			
 		}
 	}
-
+	/*
 	cout << "The tour after 2-opt: "<< endl;
 		for(int j = 0; j < solutionTours[whichTour].size(); j++)
 		{
 			cout<<solutionTours[whichTour][j] << "   " ;
 		}
 		cout<<endl;
+		*/
 }
 
 double OrienteeringProblemWithPickupsAndDeliveries::getTourLength(vector <int> tour)
@@ -863,13 +863,13 @@ void OrienteeringProblemWithPickupsAndDeliveries::insertPoints(vector <Coordinat
 		
 		if(countTrials%2==1)
 		{
-		//pickupPoint(unvisitedNodesForOneTour);
+		pickupPoint(unvisitedNodesForOneTour);
 		best=getNextPickupPointRandomised(pickupPoints, deliveryPoints, best, solutionTours[whichTour] );
 		}
 		//
 		else
 		{
-		//deliveryPoint(unvisitedNodes);
+		deliveryPoint(unvisitedNodesForOneTour);
 		best=getNextDeliveryPointRandomised(pickupPoints, deliveryPoints, best,solutionTours[whichTour] );
 		}
 
@@ -916,6 +916,7 @@ void OrienteeringProblemWithPickupsAndDeliveries::insertPoints(vector <Coordinat
 				intensity[whichTour].insert(intensity[whichTour].begin()+posToInsert, 1);
 				LoadCalculator newLoad( load[whichTour], goodsOnTheLorry[whichTour], bufferPlus[whichTour], bufferMinus[whichTour], intensity[whichTour], inputDataProcessor.getQuantities());
 				unvisitedNodes[best]=0;
+				unvisitedNodesForOneTour[best]=0;
 				//insertionEnd=true;
 				//countTrials=countTrials+1;	
 				tour.insert(tour.begin()+posToInsert, best);

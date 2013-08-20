@@ -80,24 +80,30 @@ int main(int argc, char **argv) {
 	proba.runExcelExportStart();
 	start=start+1;
 	}
+	
 		TourGreedyEinzelnePunkteSeriell tourgreedyeinzeln("tsiligirides_problem_1_budget_" + std::to_string(i) + "_300.txt", 1);
 		
 		TourGreedyEinzelnePunkteSeriell tourgreedyeinzeln2("tsiligirides_problem_1_budget_" + std::to_string(i) + "_300.txt", 3);
+		
+		
 		TourGreedyEinzelnePunkteSeriell tourgreedyeinzeln3("tsiligirides_problem_1_budget_" + std::to_string(i) + "_300.txt", 15);
+		
 		TourGreedyEinzelnePunkteSeriell tourgreedyeinzeln4("tsiligirides_problem_1_budget_" + std::to_string(i) + "_300.txt", 20);
+		
 		TourPickupDeliveryPointPairs pickupdeliverypairs("tsiligirides_problem_1_budget_" + std::to_string(i) + "_300.txt", 1);
 		
 		TourPickupDeliveryPointPairs pickupdeliverypairs2("tsiligirides_problem_1_budget_" + std::to_string(i) + "_300.txt", 3);
+	
 		TourPickupDeliveryPointPairs pickupdeliverypairs3("tsiligirides_problem_1_budget_" + std::to_string(i) + "_300.txt", 15);
 		TourPickupDeliveryPointPairs pickupdeliverypairs4("tsiligirides_problem_1_budget_" + std::to_string(i) + "_300.txt", 20);
 		
 		TourPickupDeliveryPointPairsParallel pickupdeliverypairsparallel("tsiligirides_problem_1_budget_" + std::to_string(i) + "_300.txt", 1);
-		
 		TourPickupDeliveryPointPairsParallel pickupdeliverypairsparallel2("tsiligirides_problem_1_budget_" + std::to_string(i) + "_300.txt", 3);
+	
 		TourPickupDeliveryPointPairsParallel pickupdeliverypairsparallel3("tsiligirides_problem_1_budget_" + std::to_string(i) + "_300.txt", 15);
 		
 		TourPickupDeliveryPointPairsParallel pickupdeliverypairsparallel4("tsiligirides_problem_1_budget_" + std::to_string(i) + "_300.txt", 20);
-	
+		
 	}
 	
 	//proba.runExcelExportFinish();
@@ -113,10 +119,6 @@ int main(int argc, char **argv) {
 
 	tourgreedyeinzeln.doInsertion();
 	*/
-
-
-	
-
 
 
 	cout << "Finished! Press something to exit";

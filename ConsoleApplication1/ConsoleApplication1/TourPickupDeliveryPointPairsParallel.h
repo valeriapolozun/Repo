@@ -16,6 +16,7 @@ class TourPickupDeliveryPointPairsParallel: public OrienteeringProblemWithPickup
 	~TourPickupDeliveryPointPairsParallel();
 
 	private:
+	bool twoOpt;
 	void pickUpPointToChoose(std::vector<int> & nodes);
 	void calcTourChoosePickupAndDeliveryPointPairs();
 	void getPickUpDeliveryPointPairsTwoPointsAdded (std::vector<int> unvisitedCities, int startNode, std::vector <int> & bestPair);

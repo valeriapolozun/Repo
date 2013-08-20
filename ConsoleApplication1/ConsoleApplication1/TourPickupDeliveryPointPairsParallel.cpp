@@ -15,6 +15,7 @@ bool comparator2 (const mypair2& l, const mypair2& r )
 
 TourPickupDeliveryPointPairsParallel::TourPickupDeliveryPointPairsParallel(string inputFile, int selectionPop): OrienteeringProblemWithPickupsAndDeliveries(inputFile)
 {
+	twoOpt=false;
 	
 	for (int seedNumber=0; seedNumber<100; seedNumber++) // 100 seed run
 	{
@@ -31,6 +32,19 @@ TourPickupDeliveryPointPairsParallel::TourPickupDeliveryPointPairsParallel(strin
 		calcTourChoosePickupAndDeliveryPointPairs3(selectionPop);
 	
 		profitsOfAllTheTours(seedNumber,timeStart);
+
+	if (twoOpt==false)
+	{
+	runExcelExport(inputFile, "heurParallelPairs" + std::to_string(selectionPop));
+	
+	}
+	else
+	{
+	runExcelExport(inputFile, "heurParallelPairs" + std::to_string(selectionPop) + "+2opt");
+	}
+
+
+	/*
 		runExcelExport(inputFile, "heurParallelPairs" + std::to_string(selectionPop));
 		/*
 		for (int i=0; i<solutionTours.size();i++)
@@ -38,12 +52,12 @@ TourPickupDeliveryPointPairsParallel::TourPickupDeliveryPointPairsParallel(strin
 			cout << "The tour length of the " << i+1 << ". tour is: " << getTourLength(solutionTours[i]) << endl;
 		} 
 		*/
-
+	/*
 		runTwoOpt(seedNumber, timeStart);
 		runExcelExport(inputFile, "heurParallelPairs" + std::to_string(selectionPop) + "+2opt");
 		doInsertion(seedNumber, timeStart);
 		runExcelExport(inputFile, "heurParallelPairs" + std::to_string(selectionPop) + "+2opt+insertion");
-		
+		*/
 		if (selectionPop==1)
 		{
 		break;
@@ -130,7 +144,7 @@ void TourPickupDeliveryPointPairsParallel::calcTourChoosePickupAndDeliveryPointP
 		//getPickUpDeliveryPointPairsTwoPointsAddedRandomised(unvisitedNodes, tour.back(),bestPairs, i%3, 3);
 		
 
-		if (!bestPairs[0]==0)
+		if ((!bestPairs[0]==0) && (!bestPairs[1]==0))
 		{
 			double minTourLengthExtension=DBL_MAX;
 			double TourLengthExtension;
@@ -166,8 +180,18 @@ void TourPickupDeliveryPointPairsParallel::calcTourChoosePickupAndDeliveryPointP
 
 			if (minTourLengthExtension!=DBL_MAX)
 			{
+				if ( (bestPairs[0]==0)|| (bestPairs[1]==0))
+				{
+				int p;
+				p=12;
+				}
 				solutionTours[i%numberOfTours].insert(solutionTours[i%numberOfTours].begin()+posToInsert, bestPairs[0]);
 				solutionTours[i%numberOfTours].insert(solutionTours[i%numberOfTours].begin()+posToInsert2, bestPairs[1]);
+				if (twoOpt==true)
+				{
+				doTwoOpt(i%numberOfTours);
+				}
+				
 				unvisitedNodesForOneTour[bestPairs[0]]=0;
 				unvisitedNodes[bestPairs[0]]=0;
 				unvisitedNodesForOneTour[bestPairs[1]]=0;

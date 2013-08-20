@@ -19,11 +19,11 @@ bool comparator (const mypair& l, const mypair& r )
 
 TourGreedyEinzelnePunkteSeriell::TourGreedyEinzelnePunkteSeriell(string inputFile, int selectionPop): OrienteeringProblemWithPickupsAndDeliveries(inputFile)
 {
-
+	twoOpt=false;
 	
 	for (int seedNumber=0; seedNumber<100; seedNumber++) // 100 seed run
 	{
-	//int seedNumber=44;
+	//int seedNumber=88;
 		solutionTours.clear();
 		unvisitedNodes.assign(problemSize,1);
 		unvisitedNodes[0]=0;
@@ -38,23 +38,30 @@ TourGreedyEinzelnePunkteSeriell::TourGreedyEinzelnePunkteSeriell(string inputFil
 			calcTourChoosePickupAndDeliveryPointPairs(i, selectionPop);
 		} 
 		profitsOfAllTheTours(seedNumber, timeStart);
-		
-	runExcelExport(inputFile, "heurSeriellPoint" + std::to_string(selectionPop));
-	runTwoOpt(seedNumber, timeStart);
-	runExcelExport(inputFile, "heurSeriellPoint" + std::to_string(selectionPop) + "+2opt");
-	doInsertion(seedNumber, timeStart);
-	runExcelExport(inputFile, "heurSeriellPoint" + std::to_string(selectionPop) + "+2opt+insertion");
+	
 
+	if (twoOpt==false)
+	{
+	runExcelExport(inputFile, "heurSeriellPoint" + std::to_string(selectionPop));
+	//runTwoOpt(seedNumber, timeStart);
+	}
+	else
+	{
+	runExcelExport(inputFile, "heurSeriellPoint" + std::to_string(selectionPop) + "+2opt");
+	//doInsertion(seedNumber, timeStart);
+	//runExcelExport(inputFile, "heurSeriellPoint" + std::to_string(selectionPop) + "+2opt+insertion");
+	}
+		/*
 		for (int i=0; i<solutionTours.size();i++)
 		{
 			cout << "The tour length of the " << i+1 << ". tour is: " << getTourLength(solutionTours[i]) << endl;
 		} 
+		*/
 		if (selectionPop==1)
 		{
 		break;
 		}
-
-
+		
 	}
 	
 
@@ -635,6 +642,10 @@ void TourGreedyEinzelnePunkteSeriell::putPointInBestPosition(int whichTour, int 
 	if (minTourLengthExtension!=DBL_MAX)
 	{
 		solutionTours[whichTour].insert(solutionTours[whichTour].begin()+posToInsert, pointToInsert);
+		if (twoOpt==true)
+		{
+		doTwoOpt(whichTour);
+		}
 		pickupPointInserted=true;
 		lastPickupInserted=pointToInsert;
 		pickupInsertedPosition=posToInsert;
@@ -686,6 +697,10 @@ void TourGreedyEinzelnePunkteSeriell::putDeliveryPointInBestPosition(int whichTo
 		solutionTours[whichTour].insert(solutionTours[whichTour].begin()+posToInsert, pointToInsert);
 		//intensity[whichTour].insert(intensity[whichTour].begin()+posToInsert, 1);
 		//LoadCalculator newLoad( load[whichTour], goodsOnTheLorry[whichTour], bufferPlus[whichTour], bufferMinus[whichTour], intensity[whichTour]);
+		if (twoOpt==true)
+		{
+		doTwoOpt(whichTour);
+		}
 		unvisitedNodes[pointToInsert]=0;
 		deliveryPointInserted=true;
 
